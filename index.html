@@ -158,8 +158,8 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+function initApp(){
 const SUPA_URL = 'https://nmhxrathmbyntpsihmqa.supabase.co';
 const SUPA_KEY = 'sb_publishable_Sw2TyzTk8QYwXDrZRvu0fw_uGdZ6hwI';
 const VAPID_PUBLIC = 'BHf0wVpg2v65hacqUSQnPdRT5KwNtSVJ2tdjclO9agebbnWao11y6dbtPoDa3Cn6fWkAU1FHfkV12ThGcfyJdik';
@@ -410,7 +410,26 @@ $('#bell').onclick = async ()=>{
 };
 
 if('serviceWorker'in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
-boot();
+  boot();
+}
+
+// Resilient loader — some networks (parts of Oman/India) block certain CDNs, so try several in order.
+(function load(cdns){
+  if(window.supabase) return initApp();
+  if(!cdns.length){
+    const m=document.getElementById('login-msg');
+    if(m){ m.classList.remove('hidden'); m.textContent="Couldn't load on this network — try another connection or Wi-Fi."; m.style.color='#ff4d4d'; }
+    return;
+  }
+  const s=document.createElement('script'); s.src=cdns[0];
+  s.onload=()=> window.supabase ? initApp() : load(cdns.slice(1));
+  s.onerror=()=> load(cdns.slice(1));
+  document.head.appendChild(s);
+})([
+  'https://unpkg.com/@supabase/supabase-js@2',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+  'https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.39.7/supabase.min.js'
+]);
 </script>
 </body>
 </html>
