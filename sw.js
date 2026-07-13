@@ -1,4 +1,4 @@
-const CACHE = 'weebji-hq-v1';
+const CACHE = 'weebji-hq-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './favicon.png'];
 
 self.addEventListener('install', (e) => {
