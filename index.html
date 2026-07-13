@@ -167,6 +167,11 @@
   .cft{position:fixed;top:38%;font-size:26px;z-index:90;pointer-events:none;animation:cf 1.3s ease-out forwards}
   @keyframes cf{0%{opacity:1;transform:translateY(0) scale(.6) rotate(0)}
     100%{opacity:0;transform:translateY(-180px) translateX(var(--dx)) scale(1.2) rotate(var(--rot))}}
+  /* invoices */
+  .iv-item{display:grid;grid-template-columns:1fr 52px 72px 34px;gap:6px;margin-bottom:8px;align-items:center}
+  .iv-item input{padding:11px 10px;font-size:14px}
+  .iv-item .iv-rm{background:var(--card2);color:var(--red);border-radius:11px;height:44px;font-weight:800;font-size:14px}
+  .inv-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);padding:12px 14px;border-radius:13px;box-shadow:var(--shadow)}
 </style>
 </head>
 <body>
@@ -193,6 +198,7 @@
       <p id="sub-greet">Loading your world…</p>
     </div>
     <div class="top-actions">
+      <button class="icon-btn" id="settings" title="Business details">⚙️</button>
       <button class="icon-btn" id="bell" title="Lead alerts">🔔</button>
       <button class="icon-btn" id="refresh" title="Refresh">↻</button>
       <button class="icon-btn" id="signout" title="Sign out">⎋</button>
@@ -231,7 +237,7 @@ const COUNTRIES = [['','—'],['oman','🇴🇲 Oman'],['india','🇮🇳 India'
 const CUR = [['','—'],['OMR','OMR'],['INR','INR']];
 const AV_COLORS = ['#6d5efc','#1fb571','#f5a524','#3b9dff','#ef6c9b','#12b6c9','#9b6dff','#ff8a3d'];
 
-let CLIENTS=[], FILTER='all', modalStage='lead';
+let CLIENTS=[], FILTER='all', modalStage='lead', SETTINGS={};
 
 const $=s=>document.querySelector(s);
 const el=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild;};
@@ -269,9 +275,12 @@ sb.auth.onAuthStateChange((_e,s)=>{if(s&&$('#app').classList.contains('hidden'))
 
 /* ---------- data ---------- */
 async function load(){
-  const {data,error}=await sb.from('hq_clients').select('*').order('created_at',{ascending:false});
-  if(error){toast('Couldn\'t load');return;}
-  CLIENTS=data||[];render();
+  const [clientsRes, stRes] = await Promise.all([
+    sb.from('hq_clients').select('*').order('created_at',{ascending:false}),
+    sb.from('hq_settings').select('*').eq('id','main').maybeSingle()
+  ]);
+  if(clientsRes.error){toast('Couldn\'t load');return;}
+  CLIENTS=clientsRes.data||[]; SETTINGS=stRes.data||SETTINGS||{}; render();
 }
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
 
@@ -392,6 +401,7 @@ function openSheet(id){
       <button class="btn" id="f-save" style="margin-top:18px">${isNew?'Add client':'Save ✓'}</button>
       ${isNew?'':'<button class="del" id="f-del">Delete client</button>'}
       <button class="btn ghost" id="f-close" style="margin-top:8px">Close</button>
+      <div id="f-invoices" class="${isNew?'hidden':''}"></div>
       <div class="log ${isNew?'hidden':''}" id="f-log"></div>
     </div>`));
   bg.onclick=()=>bg.remove();
@@ -404,7 +414,7 @@ function openSheet(id){
   $('#f-disc').onclick=()=>{$('#f-more').classList.toggle('hidden');$('#f-disc').classList.toggle('open');};
   $('#f-save').onclick=()=>saveClient(bg,isNew,c);
   $('#f-close').onclick=()=>bg.remove();
-  if(!isNew){$('#f-del').onclick=()=>delClient(bg,c);loadLog(id);
+  if(!isNew){$('#f-del').onclick=()=>delClient(bg,c);loadLog(id);loadInvoices(id,c);
     // auto-open deal details if there's deal data worth seeing
     if(Number(c.deal_value)>0||Number(c.amount_paid)>0||c.next_action_date){$('#f-disc').click();}
   }
@@ -459,6 +469,209 @@ async function loadLog(id){
 }
 
 $('#add').onclick=()=>openSheet(null);
+
+/* ---------- business settings ---------- */
+$('#settings').onclick=()=>openSettings();
+function openSettings(){
+  const s=SETTINGS||{};
+  const bg=el(`<div class="modal-bg"></div>`);
+  bg.appendChild(el(
+   `<div class="sheet" onclick="event.stopPropagation()">
+     <div class="grab"></div>
+     <div class="sheet-head"><div class="av" style="background:#6d5efc">W</div><div style="font-size:20px;font-weight:800">Business details</div></div>
+     <p style="color:var(--mut);font-size:13.5px;margin:-8px 2px 6px">These get stamped on every invoice.</p>
+     <div class="fg"><div class="lbl">Business name</div><input id="s-biz" value="${esc(s.biz_name||'Weebji Studios')}"></div>
+     <div class="fg"><div class="lbl">Your name</div><input id="s-owner" value="${esc(s.owner_name||'')}" placeholder="Sahil Kumar"></div>
+     <div class="row2">
+       <div class="fg"><div class="lbl">Email</div><input id="s-email" value="${esc(s.email||'')}" placeholder="you@email.com"></div>
+       <div class="fg"><div class="lbl">Phone / WhatsApp</div><input id="s-phone" value="${esc(s.phone||'')}" placeholder="+968 …"></div>
+     </div>
+     <div class="fg"><div class="lbl">How clients pay you</div><textarea id="s-pay" placeholder="Bank transfer to…&#10;Account / IBAN…&#10;or WhatsApp to arrange">${esc(s.payment_info||'')}</textarea></div>
+     <button class="btn" id="s-save" style="margin-top:6px">Save</button>
+     <button class="btn ghost" id="s-close" style="margin-top:8px">Close</button>
+   </div>`));
+  bg.onclick=()=>bg.remove();document.body.appendChild(bg);
+  $('#s-close').onclick=()=>bg.remove();
+  $('#s-save').onclick=async()=>{
+    const rec={id:'main',biz_name:$('#s-biz').value.trim()||'Weebji Studios',owner_name:$('#s-owner').value.trim()||null,email:$('#s-email').value.trim()||null,phone:$('#s-phone').value.trim()||null,payment_info:$('#s-pay').value.trim()||null,updated_at:new Date().toISOString()};
+    $('#s-save').textContent='Saving…';
+    const {error}=await sb.from('hq_settings').upsert(rec,{onConflict:'id'});
+    if(error){toast('Save failed');$('#s-save').textContent='Save';return;}
+    SETTINGS={...SETTINGS,...rec};bg.remove();toast('Saved ✓');
+  };
+}
+
+/* ---------- invoices ---------- */
+function invCalc(items,discount){const sub=items.reduce((s,it)=>s+(Number(it.qty||0)*Number(it.rate||0)),0);return {sub,total:Math.max(0,sub-Number(discount||0))};}
+
+async function loadInvoices(clientId, client){
+  const box=$('#f-invoices');if(!box)return;
+  const {data}=await sb.from('hq_invoices').select('*').eq('client_id',clientId).order('created_at',{ascending:false});
+  const rows=data||[];
+  box.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;border-top:1px solid var(--line);padding-top:16px">
+      <h3 style="font-size:12.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Invoices</h3>
+      <button id="inv-new" style="background:var(--card2);color:var(--primary);font-weight:800;font-size:13.5px;padding:8px 13px;border-radius:11px">＋ New invoice</button>
+    </div>
+    <div id="inv-list" style="margin-top:11px;display:flex;flex-direction:column;gap:9px"></div>`;
+  const list=$('#inv-list');
+  list.innerHTML=rows.length?rows.map(iv=>
+    `<div class="inv-row" data-id="${iv.id}">
+       <div><div style="font-weight:800">${esc(iv.number)}</div><div style="color:var(--mut);font-size:12.5px">${fmtDate(iv.issue_date)} · ${money(iv.total,iv.currency)}</div></div>
+       <span class="stg ${iv.status==='paid'?'green':iv.status==='sent'?'blue':'gray'}">${iv.status}</span>
+     </div>`).join(''):'<div style="color:var(--mut);font-size:13.5px">No invoices yet — tap ＋ New invoice.</div>';
+  list.querySelectorAll('.inv-row').forEach(r=>r.onclick=()=>openInvoice(client, rows.find(x=>x.id===r.dataset.id)));
+  $('#inv-new').onclick=()=>openInvoice(client, null);
+}
+
+function openInvoice(client, inv){
+  const isNew=!inv;
+  const cur=(inv&&inv.currency)||client.currency||'';
+  let items=(inv&&inv.items&&inv.items.length)?JSON.parse(JSON.stringify(inv.items)):[{desc:'',qty:1,rate:0}];
+  const bg=el(`<div class="modal-bg"></div>`);
+  bg.appendChild(el(
+   `<div class="sheet" onclick="event.stopPropagation()">
+     <div class="grab"></div>
+     <div class="sheet-head"><div style="font-size:20px;font-weight:800">${isNew?'New invoice':esc(inv.number)}</div></div>
+     <p style="color:var(--mut);font-size:13.5px;margin:-8px 2px 6px">For ${esc(client.name)}</p>
+     <div class="row2">
+       <div class="fg"><div class="lbl">Issue date</div><input id="iv-issue" type="date" value="${(inv&&inv.issue_date)||today()}"></div>
+       <div class="fg"><div class="lbl">Due date</div><input id="iv-due" type="date" value="${(inv&&inv.due_date)||''}"></div>
+     </div>
+     <div class="fg"><div class="lbl">Currency</div><select id="iv-cur">${['','OMR','INR'].map(v=>`<option value="${v}" ${v===cur?'selected':''}>${v||'—'}</option>`).join('')}</select></div>
+     <div class="lbl">Items</div>
+     <div id="iv-items"></div>
+     <button id="iv-add" style="background:var(--card2);color:var(--primary);font-weight:800;font-size:14px;padding:12px;border-radius:12px;width:100%;margin-top:2px">＋ Add item</button>
+     <div class="row2" style="margin-top:16px">
+       <div class="fg"><div class="lbl">Discount</div><input id="iv-disc" type="number" inputmode="decimal" value="${(inv&&inv.discount)||0}"></div>
+       <div class="fg"><div class="lbl">Total</div><div id="iv-total" style="font-size:23px;font-weight:800;padding-top:6px"></div></div>
+     </div>
+     <div class="fg"><div class="lbl">Notes / payment terms</div><textarea id="iv-notes" placeholder="Payment terms, thank-you note…">${esc((inv&&inv.notes)||SETTINGS.payment_info||'')}</textarea></div>
+     <button class="btn" id="iv-save" style="margin-top:6px">${isNew?'Create invoice':'Save changes'}</button>
+     ${isNew?'':`<button class="btn green" id="iv-pdf" style="margin-top:8px">⬇︎  Download / Share PDF</button>
+       <div style="display:flex;gap:8px;margin-top:8px">
+         <button class="btn ghost" id="iv-sent" style="flex:1;font-size:14px">Mark sent</button>
+         <button class="btn ghost" id="iv-paid" style="flex:1;font-size:14px">Mark paid 💰</button>
+       </div>
+       <button class="del" id="iv-del">Delete invoice</button>`}
+     <button class="btn ghost" id="iv-close" style="margin-top:8px">Close</button>
+   </div>`));
+  bg.onclick=()=>bg.remove();document.body.appendChild(bg);
+
+  function renderItems(){
+    const box=$('#iv-items');box.innerHTML='';
+    items.forEach((it,i)=>{
+      const row=el(`<div class="iv-item">
+        <input class="iv-desc" placeholder="Description" value="${esc(it.desc||'')}">
+        <input class="iv-qty" type="number" inputmode="decimal" value="${it.qty??1}">
+        <input class="iv-rate" type="number" inputmode="decimal" value="${it.rate??0}">
+        <button class="iv-rm">✕</button>
+      </div>`);
+      row.querySelector('.iv-desc').oninput=e=>{it.desc=e.target.value;};
+      row.querySelector('.iv-qty').oninput=e=>{it.qty=e.target.value;calc();};
+      row.querySelector('.iv-rate').oninput=e=>{it.rate=e.target.value;calc();};
+      row.querySelector('.iv-rm').onclick=()=>{items.splice(i,1);if(!items.length)items.push({desc:'',qty:1,rate:0});renderItems();calc();};
+      box.appendChild(row);
+    });
+  }
+  function calc(){const{total}=invCalc(items,$('#iv-disc').value);$('#iv-total').textContent=money(total,$('#iv-cur').value);}
+  renderItems();calc();
+  $('#iv-add').onclick=()=>{items.push({desc:'',qty:1,rate:0});renderItems();calc();};
+  $('#iv-disc').oninput=calc;$('#iv-cur').onchange=calc;
+  $('#iv-close').onclick=()=>bg.remove();
+
+  function cleanItems(){return items.filter(it=>(it.desc||'').toString().trim()||Number(it.rate)>0).map(it=>({desc:(it.desc||'').toString().trim(),qty:Number(it.qty||0),rate:Number(it.rate||0)}));}
+  function snapshot(){const ci=cleanItems();const{sub,total}=invCalc(ci,$('#iv-disc').value);return {number:inv&&inv.number, issue_date:$('#iv-issue').value||today(), due_date:$('#iv-due').value||null, currency:$('#iv-cur').value||null, items:ci, subtotal:sub, discount:Number($('#iv-disc').value||0), total, notes:$('#iv-notes').value.trim()||null};}
+
+  $('#iv-save').onclick=async()=>{
+    const snap=snapshot();
+    if(!snap.items.length){toast('Add at least one item');return;}
+    $('#iv-save').textContent='Saving…';
+    if(isNew){
+      const seq=(SETTINGS.next_inv||1);
+      snap.seq=seq;snap.number='WEEBJI-'+String(seq).padStart(4,'0');snap.status='draft';snap.client_id=client.id;
+      const {error}=await sb.from('hq_invoices').insert(snap);
+      if(error){toast('Save failed');$('#iv-save').textContent='Create invoice';return;}
+      await sb.from('hq_settings').update({next_inv:seq+1}).eq('id','main');SETTINGS.next_inv=seq+1;
+      await sb.from('hq_activity').insert({client_id:client.id,kind:'note',body:'Invoice '+snap.number+' created ('+money(snap.total,snap.currency)+')'});
+    }else{
+      const {error}=await sb.from('hq_invoices').update({issue_date:snap.issue_date,due_date:snap.due_date,currency:snap.currency,items:snap.items,subtotal:snap.subtotal,discount:snap.discount,total:snap.total,notes:snap.notes}).eq('id',inv.id);
+      if(error){toast('Save failed');$('#iv-save').textContent='Save changes';return;}
+    }
+    bg.remove();toast('Invoice saved ✓');
+    if(document.getElementById('f-invoices'))loadInvoices(client.id,client);
+  };
+
+  if(!isNew){
+    $('#iv-del').onclick=async()=>{if(!confirm('Delete '+inv.number+'?'))return;await sb.from('hq_invoices').delete().eq('id',inv.id);bg.remove();toast('Deleted');if(document.getElementById('f-invoices'))loadInvoices(client.id,client);};
+    $('#iv-sent').onclick=async()=>{await sb.from('hq_invoices').update({status:'sent'}).eq('id',inv.id);inv.status='sent';toast('Marked sent');if(document.getElementById('f-invoices'))loadInvoices(client.id,client);};
+    $('#iv-paid').onclick=async()=>{await sb.from('hq_invoices').update({status:'paid'}).eq('id',inv.id);inv.status='paid';await sb.from('hq_activity').insert({client_id:client.id,kind:'note',body:'Invoice '+inv.number+' paid 💰'});confetti();toast('Paid 💰');if(document.getElementById('f-invoices'))loadInvoices(client.id,client);};
+    $('#iv-pdf').onclick=()=>{const snap=snapshot();snap.number=inv.number;makeInvoicePDF(snap,client);};
+  }
+}
+
+let _pdfLib=null;
+function loadHtml2pdf(){
+  if(window.html2pdf)return Promise.resolve(window.html2pdf);
+  return new Promise((res,rej)=>{
+    const cdns=['https://unpkg.com/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js','https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js','https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'];
+    (function t(i){if(i>=cdns.length)return rej();const s=document.createElement('script');s.src=cdns[i];s.onload=()=>window.html2pdf?res(window.html2pdf):t(i+1);s.onerror=()=>t(i+1);document.head.appendChild(s);})(0);
+  });
+}
+
+function invoiceHTML(inv,client){
+  const s=SETTINGS||{};
+  const rows=inv.items.map(it=>`<tr><td style="padding:9px 12px;border-bottom:1px solid #eee">${esc(it.desc)}</td><td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:center">${it.qty}</td><td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right">${money(it.rate,inv.currency)}</td><td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right">${money(Number(it.qty)*Number(it.rate),inv.currency)}</td></tr>`).join('');
+  return `<div style="width:720px;padding:46px;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;background:#fff;box-sizing:border-box">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #6d5efc;padding-bottom:20px">
+      <div><div style="font-size:26px;font-weight:800;letter-spacing:-.5px">${esc(s.biz_name||'Weebji Studios')}</div>
+      <div style="color:#666;font-size:13px;margin-top:5px">${esc(s.owner_name||'')}</div>
+      <div style="color:#666;font-size:13px">${esc(s.email||'')}${s.email&&s.phone?'  ·  ':''}${esc(s.phone||'')}</div></div>
+      <div style="text-align:right"><div style="font-size:30px;font-weight:800;color:#6d5efc;letter-spacing:1px">INVOICE</div>
+      <div style="font-size:14px;font-weight:700;margin-top:5px">${esc(inv.number||'')}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:26px">
+      <div><div style="color:#999;font-size:11px;text-transform:uppercase;letter-spacing:1px">Bill to</div>
+      <div style="font-size:16px;font-weight:700;margin-top:5px">${esc(client.name)}</div>
+      <div style="color:#666;font-size:13px">${esc(client.email||'')}</div>
+      <div style="color:#666;font-size:13px">${esc(client.phone||'')}</div></div>
+      <div style="text-align:right;font-size:13px;color:#666"><div>Issued: <b style="color:#1c1c1c">${fmtDate(inv.issue_date)||''}</b></div>
+      ${inv.due_date?`<div style="margin-top:3px">Due: <b style="color:#1c1c1c">${fmtDate(inv.due_date)}</b></div>`:''}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-top:26px;font-size:14px">
+      <thead><tr style="background:#f4f2fb;color:#555"><th style="text-align:left;padding:11px 12px">Description</th><th style="padding:11px 12px">Qty</th><th style="text-align:right;padding:11px 12px">Rate</th><th style="text-align:right;padding:11px 12px">Amount</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end;margin-top:20px">
+      <div style="width:270px">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;color:#555;font-size:14px"><span>Subtotal</span><span>${money(inv.subtotal,inv.currency)}</span></div>
+        ${Number(inv.discount)>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;color:#555;font-size:14px"><span>Discount</span><span>−${money(inv.discount,inv.currency)}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;padding:13px 0;margin-top:4px;border-top:2px solid #1c1c1c;font-size:19px;font-weight:800"><span>Total</span><span>${money(inv.total,inv.currency)}</span></div>
+      </div>
+    </div>
+    ${(inv.notes||s.payment_info)?`<div style="margin-top:30px;padding:16px 18px;background:#f7f6fb;border-radius:10px;font-size:13px;color:#444;white-space:pre-wrap;line-height:1.6"><b style="color:#6d5efc">Payment</b><br>${esc(inv.notes||s.payment_info||'')}</div>`:''}
+    <div style="margin-top:36px;text-align:center;color:#aaa;font-size:12px">Thank you — ${esc(s.biz_name||'Weebji Studios')}</div>
+  </div>`;
+}
+
+async function makeInvoicePDF(inv,client){
+  toast('Building PDF…');
+  let h2p;try{h2p=await loadHtml2pdf();}catch(e){toast('PDF blocked on this network');return;}
+  const holder=document.createElement('div');holder.style.cssText='position:fixed;left:-9999px;top:0;';
+  holder.innerHTML=invoiceHTML(inv,client);document.body.appendChild(holder);
+  const node=holder.firstElementChild;
+  const name=(inv.number||'invoice')+'.pdf';
+  const opt={margin:0,filename:name,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'pt',format:'a4',orientation:'portrait'}};
+  try{
+    const blob=await h2p().set(opt).from(node).outputPdf('blob');
+    const file=new File([blob],name,{type:'application/pdf'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:inv.number||'Invoice'}).catch(()=>{});
+    }else{
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+    }
+  }catch(e){toast('PDF failed');}
+  holder.remove();
+}
 
 /* ---------- push ---------- */
 function urlB64ToUint8(b64){const pad='='.repeat((4-b64.length%4)%4);const b=(b64+pad).replace(/-/g,'+').replace(/_/g,'/');const raw=atob(b);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));}
