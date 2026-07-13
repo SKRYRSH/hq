@@ -128,15 +128,10 @@
     <h1>Weebji HQ</h1>
     <p>Your private command center. Every lead and client, one place.</p>
   </div>
-  <div id="login-step1" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px">
-    <input id="login-email" type="email" placeholder="you@email.com" value="sahil.kumar.chindalia@gmail.com" autocomplete="email">
-    <button class="g-btn" id="send-code" style="justify-content:center">Email me a login code</button>
-  </div>
-  <div id="login-step2" class="hidden" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px">
-    <input id="login-code" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" style="text-align:center;letter-spacing:6px;font-size:20px;font-weight:700">
-    <button class="g-btn" id="verify-code" style="justify-content:center">Verify & sign in</button>
-    <button class="close" id="back-email" style="margin:0">Use a different email</button>
-  </div>
+  <button class="g-btn" id="signin">
+    <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.7 30.2 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6c1.9-5.6 7.1-9.8 13.7-9.8z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.1-3.8 6.5-9.4 6.5-16z"/><path fill="#FBBC05" d="M10.3 28.3c-.5-1.4-.7-2.9-.7-4.3s.3-3 .7-4.3l-7.8-6C.9 16.9 0 20.3 0 24s.9 7.1 2.5 10.3l7.8-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.5l-7.1-5.5c-2 1.3-4.6 2.1-8.2 2.1-6.6 0-11.8-4.2-13.7-9.8l-7.8 6C6.4 42.6 14.6 48 24 48z"/></svg>
+    Sign in with Google
+  </button>
   <p id="login-msg" style="font-size:13px" class="hidden"></p>
 </div>
 
@@ -187,32 +182,9 @@ function fmtDate(d){ if(!d) return ''; const dt=new Date(d+'T00:00:00'); return 
 function svcLabel(s){ return s||'Enquiry'; }
 function countryFlag(c){ return ({oman:'🇴🇲',india:'🇮🇳',other:'🌍'})[c]||''; }
 
-/* ---------- auth (passwordless email code) ---------- */
+/* ---------- auth (Google) ---------- */
 function loginMsg(m, err){ const e=$('#login-msg'); e.textContent=m; e.style.color=err?'var(--red)':'var(--mut)'; e.classList.remove('hidden'); }
-$('#send-code').onclick = async () => {
-  const email = $('#login-email').value.trim().toLowerCase();
-  if(!email){ loginMsg('Enter your email', true); return; }
-  $('#send-code').textContent='Sending…';
-  const { error } = await sb.auth.signInWithOtp({ email, options:{ shouldCreateUser:true, emailRedirectTo: location.href.split('#')[0] } });
-  $('#send-code').textContent='Email me a login code';
-  if(error){ loginMsg(error.message, true); return; }
-  $('#login-step1').classList.add('hidden');
-  $('#login-step2').classList.remove('hidden');
-  loginMsg('Code sent to '+email+'. Check inbox + spam.');
-  $('#login-code').focus();
-};
-$('#verify-code').onclick = async () => {
-  const email = $('#login-email').value.trim().toLowerCase();
-  const token = $('#login-code').value.trim();
-  if(token.length < 6){ loginMsg('Enter the 6-digit code', true); return; }
-  $('#verify-code').textContent='Verifying…';
-  const { error } = await sb.auth.verifyOtp({ email, token, type:'email' });
-  $('#verify-code').textContent='Verify & sign in';
-  if(error){ loginMsg(error.message, true); return; }
-  // success -> onAuthStateChange fires boot()
-};
-$('#login-code').addEventListener('keydown', e => { if(e.key==='Enter') $('#verify-code').click(); });
-$('#back-email').onclick = () => { $('#login-step2').classList.add('hidden'); $('#login-step1').classList.remove('hidden'); $('#login-msg').classList.add('hidden'); };
+$('#signin').onclick = () => sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.href.split('#')[0] } });
 $('#signout').onclick = async () => { await sb.auth.signOut(); location.reload(); };
 
 async function boot(){
