@@ -172,6 +172,127 @@
   .iv-item input{padding:11px 10px;font-size:14px}
   .iv-item .iv-rm{background:var(--card2);color:var(--red);border-radius:11px;height:44px;font-weight:800;font-size:14px}
   .inv-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);padding:12px 14px;border-radius:13px;box-shadow:var(--shadow)}
+
+  /* ============ LIFE HQ ============ */
+  main{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+
+  /* bottom nav */
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.88);
+    backdrop-filter:blur(14px) saturate(1.6);border-top:1px solid var(--line);
+    padding:7px 6px calc(7px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:2px}
+  nav .nv{flex:1;max-width:96px;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:6px 2px;border-radius:14px;color:var(--mut);font-size:10.5px;font-weight:800;letter-spacing:.2px;
+    transition:color .15s,background .15s}
+  nav .nv .ic{font-size:19px;line-height:1;transition:transform .18s cubic-bezier(.2,1.4,.4,1)}
+  nav .nv.on{color:var(--primary);background:#f1eeff}
+  nav .nv.on .ic{transform:translateY(-2px) scale(1.14)}
+  nav .nv .dot{position:absolute;margin-left:17px;margin-top:-2px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+
+  .view{animation:vin .28s cubic-bezier(.2,1,.4,1)}
+  @keyframes vin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+  /* section heading */
+  .sect{display:flex;align-items:baseline;gap:9px;margin:26px 3px 12px}
+  .sect:first-child{margin-top:6px}
+  .sect h2{font-size:17px;font-weight:800;letter-spacing:-.35px}
+  .sect .cnt{color:var(--mut);font-size:13px;font-weight:700}
+  .sect .act{margin-left:auto;color:var(--primary);font-weight:800;font-size:13.5px;background:none;padding:4px}
+
+  /* hero directive */
+  .hero{position:relative;overflow:hidden;border-radius:24px;padding:22px 20px;color:#fff;
+    background:linear-gradient(135deg,#6d5efc 0%,#8b5cf6 48%,#c05efc 100%);
+    box-shadow:0 8px 28px rgba(109,94,252,.34)}
+  .hero::after{content:'';position:absolute;right:-46px;top:-58px;width:170px;height:170px;border-radius:50%;
+    background:rgba(255,255,255,.13)}
+  .hero::before{content:'';position:absolute;right:22px;bottom:-64px;width:110px;height:110px;border-radius:50%;
+    background:rgba(255,255,255,.09)}
+  .hero .k{font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;opacity:.8}
+  .hero h2{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-top:7px;line-height:1.32;position:relative;z-index:1}
+  .hero p{font-size:14px;opacity:.9;margin-top:8px;line-height:1.5;position:relative;z-index:1}
+  .hero .go{margin-top:15px;background:rgba(255,255,255,.96);color:#5646e0;font-weight:800;font-size:14.5px;
+    padding:11px 17px;border-radius:14px;position:relative;z-index:1;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+  .hero .go:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+
+  /* generic tile */
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px;
+    box-shadow:var(--shadow);animation:pop .35s cubic-bezier(.2,1.2,.4,1)}
+  .tile.tap{transition:transform .1s}
+  .tile.tap:active{transform:scale(.985)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+
+  /* row item */
+  .ri{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px 14px;
+    display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);animation:pop .35s cubic-bezier(.2,1.2,.4,1);transition:transform .1s}
+  .ri.tap:active{transform:scale(.985)}
+  .ri .ico{width:38px;height:38px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;font-size:18px;background:var(--card2)}
+  .ri .mid{margin-right:auto;min-width:0}
+  .ri .t1{font-weight:800;font-size:15.5px;letter-spacing:-.15px}
+  .ri .t2{color:var(--mut);font-size:12.8px;font-weight:600;margin-top:2px}
+  .ri .t2.bad{color:var(--red);font-weight:700}
+  .ri .t2.good{color:var(--green-d);font-weight:700}
+  .ri .rt{flex-shrink:0;text-align:right;font-weight:800;font-size:14.5px}
+
+  /* pill */
+  .pill{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .pill.todo{background:#f0ede7;color:#8a8172}
+  .pill.doing{background:#fff2dd;color:#c9820e}
+  .pill.done{background:#e6f8ef;color:#12934f}
+  .pill.warn{background:#ffe9ec;color:#d63a4b}
+
+  /* progress */
+  .bar{height:9px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:9px}
+  .bar > i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#6d5efc,#9b6dff);
+    transition:width .5s cubic-bezier(.2,1,.4,1)}
+  .bar.g > i{background:linear-gradient(90deg,#1fb571,#6ee7a8)}
+
+  /* visa stepper */
+  .steps{display:flex;align-items:center;gap:0;margin:14px 2px 4px}
+  .steps .s{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+  .steps .s .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12.5px;font-weight:800;
+    background:var(--card2);color:var(--mut);border:2px solid transparent;z-index:1}
+  .steps .s.dn .n{background:var(--green);color:#fff}
+  .steps .s.cur .n{background:var(--primary);color:#fff;border-color:#d8d2ff;box-shadow:0 0 0 4px #efecff}
+  .steps .s .lb{font-size:9.5px;font-weight:800;color:var(--mut);text-align:center;letter-spacing:.1px}
+  .steps .s.cur .lb{color:var(--primary)}
+  .steps .s::before{content:'';position:absolute;top:15px;left:-50%;width:100%;height:2.5px;background:var(--card2)}
+  .steps .s:first-child::before{display:none}
+  .steps .s.dn::before,.steps .s.cur::before{background:var(--green)}
+
+  /* habit check */
+  .hb{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:15px;padding:12px 13px;box-shadow:var(--shadow)}
+  .hb .ck{width:34px;height:34px;border-radius:11px;flex-shrink:0;border:2.5px solid var(--line);background:var(--card2);
+    display:grid;place-items:center;font-size:16px;color:transparent;transition:all .18s cubic-bezier(.2,1.4,.4,1)}
+  .hb.on .ck{background:var(--green);border-color:var(--green);color:#fff;transform:scale(1.06)}
+  .hb .mid{margin-right:auto;min-width:0}
+  .hb .nm{font-weight:800;font-size:15.5px}
+  .hb.on .nm{color:var(--mut);text-decoration:line-through}
+  .hb .wk{display:flex;gap:3.5px;margin-top:6px}
+  .hb .wk i{width:13px;height:5px;border-radius:5px;background:var(--card2)}
+  .hb .wk i.f{background:var(--green)}
+  .hb .strk{font-size:13px;font-weight:800;color:var(--amber);flex-shrink:0}
+
+  /* money */
+  .mrow{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--line)}
+  .mrow:last-child{border-bottom:none}
+  .mrow .mi{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+  .mrow .mi.in{background:#e6f8ef}
+  .mrow .mi.out{background:#ffeef0}
+  .mrow .mid{margin-right:auto;min-width:0}
+  .mrow .t1{font-weight:700;font-size:14.5px}
+  .mrow .t2{color:var(--mut);font-size:12px;font-weight:600;margin-top:1px}
+  .mrow .amt{font-weight:800;font-size:14.5px;flex-shrink:0}
+  .mrow .amt.in{color:var(--green-d)}
+  .mrow .amt.out{color:var(--ink2)}
+  .curcard{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px 15px;box-shadow:var(--shadow)}
+  .curcard .c{font-size:11px;font-weight:800;color:var(--mut);letter-spacing:.8px}
+  .curcard .v{font-size:19px;font-weight:800;letter-spacing:-.5px;margin-top:3px}
+  .curcard .d{font-size:11.5px;font-weight:700;margin-top:3px}
+
+  /* seg control */
+  .seg{display:flex;background:var(--card2);border-radius:14px;padding:4px;gap:3px;margin:2px 0 4px}
+  .seg button{flex:1;padding:9px 6px;border-radius:11px;font-weight:800;font-size:13.5px;color:var(--mut);background:none;transition:all .15s}
+  .seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
 </style>
 </head>
 <body>
@@ -181,7 +302,7 @@
   <img class="logo" src="./icon-192.png" alt="Weebji HQ">
   <div>
     <h1>Weebji HQ</h1>
-    <p>Every client and deal, in one place.</p>
+    <p>Moscow, money, the grind, the studio — one place.</p>
   </div>
   <button class="g-btn" id="signin">
     <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.7 30.2 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6c1.9-5.6 7.1-9.8 13.7-9.8z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.1-3.8 6.5-9.4 6.5-16z"/><path fill="#FBBC05" d="M10.3 28.3c-.5-1.4-.7-2.9-.7-4.3s.3-3 .7-4.3l-7.8-6C.9 16.9 0 20.3 0 24s.9 7.1 2.5 10.3l7.8-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.5l-7.1-5.5c-2 1.3-4.6 2.1-8.2 2.1-6.6 0-11.8-4.2-13.7-9.8l-7.8 6C6.4 42.6 14.6 48 24 48z"/></svg>
@@ -205,11 +326,24 @@
     </div>
   </header>
   <main>
-    <div class="chips" id="chips"></div>
-    <div class="filters" id="filters"></div>
-    <div class="list" id="list"></div>
+    <div class="view hidden" id="v-today"></div>
+    <div class="view hidden" id="v-russia"></div>
+    <div class="view hidden" id="v-money"></div>
+    <div class="view hidden" id="v-grind"></div>
+    <div class="view hidden" id="v-studio">
+      <div class="chips" id="chips"></div>
+      <div class="filters" id="filters"></div>
+      <div class="list" id="list"></div>
+    </div>
   </main>
-  <button class="fab" id="add"><span class="p">+</span> Add</button>
+  <button class="fab hidden" id="add"><span class="p">+</span> Add</button>
+  <nav>
+    <button class="nv" data-v="today"><span class="ic">🎯</span>Today</button>
+    <button class="nv" data-v="russia"><span class="ic">🇷🇺</span>Russia</button>
+    <button class="nv" data-v="money"><span class="ic">💰</span>Money</button>
+    <button class="nv" data-v="grind"><span class="ic">🔥</span>Grind</button>
+    <button class="nv" data-v="studio"><span class="ic">💼</span>Studio</button>
+  </nav>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -239,10 +373,28 @@ const AV_COLORS = ['#6d5efc','#1fb571','#f5a524','#3b9dff','#ef6c9b','#12b6c9','
 
 let CLIENTS=[], FILTER='all', modalStage='lead', SETTINGS={};
 
+/* ---- life hq state ---- */
+const CUR_ALL=['OMR','INR','USD','RUB'];
+const VISA_STEPS=[
+  {n:1,l:'Applied'},{n:2,l:'Review'},{n:3,l:'Approved'},{n:4,l:'Distributed'},
+  {n:5,l:'Directed'},{n:6,l:'Указание'},{n:7,l:'Visa'}
+];
+const DOC_STATUS=[['todo','Not started'],['doing','In progress'],['done','Done']];
+const AREAS=[['russia','🇷🇺 Russia'],['study','📚 Study'],['weebji','⚡ Weebji'],['health','🏋️ Health'],['money','💰 Money'],['studio','💼 Studio']];
+const CATS_IN=['Client payment','Play Store','Family','Other income'];
+const CATS_OUT=['Translations','Medicals','Visa & travel','Food','Subscriptions','Other'];
+let LEDGER=[], GOALS=[], DOCS=[], DEADLINES=[], HABITS=[], HLOGS=[], WEIGHTS=[], LIFE={};
+let VIEW=localStorage.getItem('hq_view')||'today';
+let LEDGER_FILTER='all';
+
 const $=s=>document.querySelector(s);
 const el=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild;};
 const esc=s=>(s??'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const today=()=>new Date().toISOString().slice(0,10);
+// LOCAL calendar date, not UTC. Oman is UTC+4 and Moscow UTC+3, so a plain
+// toISOString() rolls the date back a day every evening — that silently broke
+// streaks and follow-up dates. Everything date-shaped must go through these.
+const ymd=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+const today=()=>ymd(new Date());
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 function money(n,cur){n=Number(n||0);return (cur==='OMR'?n.toFixed(3):n.toLocaleString(undefined,{maximumFractionDigits:2}))+(cur?(' '+cur):'');}
 function fmtDate(d){if(!d)return '';return new Date(d+'T00:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'});}
@@ -269,18 +421,29 @@ async function boot(){
   if(!session){$('#login').classList.remove('hidden');return;}
   if(session.user.email!==OWNER_EMAIL){await sb.auth.signOut();$('#login').classList.remove('hidden');loginMsg("That account isn't authorized.",true);return;}
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');
-  await load();subscribeRealtime();refreshBell();
+  await load();setView(VIEW);subscribeRealtime();refreshBell();
 }
 sb.auth.onAuthStateChange((_e,s)=>{if(s&&$('#app').classList.contains('hidden'))boot();});
 
 /* ---------- data ---------- */
 async function load(){
-  const [clientsRes, stRes] = await Promise.all([
+  const [clientsRes, stRes, ledRes, goalRes, docRes, dlRes, hbRes, hlRes, wtRes, lifeRes] = await Promise.all([
     sb.from('hq_clients').select('*').order('created_at',{ascending:false}),
-    sb.from('hq_settings').select('*').eq('id','main').maybeSingle()
+    sb.from('hq_settings').select('*').eq('id','main').maybeSingle(),
+    sb.from('hq_ledger').select('*').order('occurred_on',{ascending:false}).limit(400),
+    sb.from('hq_goals').select('*').order('sort'),
+    sb.from('hq_docs').select('*').order('sort'),
+    sb.from('hq_deadlines').select('*').order('due_on'),
+    sb.from('hq_habits').select('*').order('sort'),
+    sb.from('hq_habit_logs').select('*').gte('on_date',daysAgo(120)),
+    sb.from('hq_weight').select('*').order('on_date',{ascending:false}).limit(90),
+    sb.from('hq_life').select('*').eq('id','main').maybeSingle()
   ]);
   if(clientsRes.error){toast('Couldn\'t load');return;}
-  CLIENTS=clientsRes.data||[]; SETTINGS=stRes.data||SETTINGS||{}; render();
+  CLIENTS=clientsRes.data||[]; SETTINGS=stRes.data||SETTINGS||{};
+  LEDGER=ledRes.data||[]; GOALS=goalRes.data||[]; DOCS=docRes.data||[]; DEADLINES=dlRes.data||[];
+  HABITS=hbRes.data||[]; HLOGS=hlRes.data||[]; WEIGHTS=wtRes.data||[]; LIFE=(lifeRes.data&&lifeRes.data.data)||{};
+  render();
 }
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
 
@@ -293,22 +456,11 @@ function subscribeRealtime(){
   }).subscribe();
 }
 
-/* ---------- render ---------- */
-function render(){
+/* ---------- render: studio ---------- */
+function renderStudio(){
   const active=CLIENTS.filter(c=>!['paid','lost'].includes(c.stage));
-  const newLeads=CLIENTS.filter(c=>c.stage==='lead').length;
   const overdue=CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<today()&&!['paid','lost'].includes(c.stage)).length;
   const coll={};CLIENTS.forEach(c=>{if(Number(c.amount_paid)>0){const k=c.currency||'';coll[k]=(coll[k]||0)+Number(c.amount_paid);}});
-
-  // greeting
-  const name='Sahil';
-  $('#greet').textContent=`${partOfDay()}, ${name} 👋`;
-  let sub;
-  if(newLeads>0) sub=`${newLeads} new ${newLeads>1?'leads':'lead'} 👀`;
-  else if(overdue>0) sub=`${overdue} follow-up${overdue>1?'s':''} due today ⏰`;
-  else if(active.length) sub=`${active.length} active client${active.length>1?'s':''}`;
-  else sub='No clients yet — go get some 🌱';
-  $('#sub-greet').textContent=sub;
 
   // chips
   const collStr=Object.keys(coll).length?Object.entries(coll).map(([k,v])=>money(v,k)).join(' · '):'nothing yet';
@@ -670,6 +822,523 @@ async function makeInvoicePDF(inv,client){
       const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
     }
   }catch(e){toast('PDF failed');}
+  holder.remove();
+}
+
+/* ================= LIFE HQ ================= */
+function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymd(d);}
+function daysAgo(n){return addDays(today(),-n);}
+function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function relDay(d){if(!d)return '';const n=daysBetween(today(),d);
+  if(n===0)return 'today';if(n===1)return 'tomorrow';if(n===-1)return 'yesterday';
+  if(n<0)return Math.abs(n)+'d overdue';return 'in '+n+'d';}
+function docStatusLabel(s){return (DOC_STATUS.find(x=>x[0]===s)||DOC_STATUS[0])[1];}
+function areaEmoji(a){const f=AREAS.find(x=>x[0]===a);return f?f[1].split(' ')[0]:'•';}
+
+/* ---- generic form sheet ---- */
+function openForm({title,emoji,color,fields,save,del,extra}){
+  const bg=el(`<div class="modal-bg"></div>`);
+  bg.appendChild(el(
+   `<div class="sheet" onclick="event.stopPropagation()">
+      <div class="grab"></div>
+      <div class="sheet-head">
+        <div class="av" style="background:${color||'#6d5efc'}">${emoji||'✳️'}</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.3px">${esc(title)}</div>
+      </div>
+      ${fields}
+      <button class="btn" id="k-save" style="margin-top:18px">Save ✓</button>
+      ${del?'<button class="del" id="k-del">Delete</button>':''}
+      <button class="btn ghost" id="k-close" style="margin-top:8px">Close</button>
+      ${extra||''}
+    </div>`));
+  bg.onclick=()=>bg.remove();document.body.appendChild(bg);
+  $('#k-close').onclick=()=>bg.remove();
+  $('#k-save').onclick=async()=>{
+    $('#k-save').textContent='Saving…';
+    try{ const ok=await save(); if(ok===false){$('#k-save').textContent='Save ✓';return;} }
+    catch(e){toast('Save failed');$('#k-save').textContent='Save ✓';return;}
+    bg.remove();toast('Saved ✓');load();
+  };
+  if(del)$('#k-del').onclick=async()=>{ if(!confirm('Delete this?'))return; try{await del();}catch(e){toast('Delete failed');return;} bg.remove();toast('Removed');load(); };
+  return bg;
+}
+const fld=(label,inner)=>`<div class="fg"><div class="lbl">${label}</div>${inner}</div>`;
+
+/* ---- habits ---- */
+const logsFor=id=>HLOGS.filter(l=>l.habit_id===id).map(l=>l.on_date);
+function habitDone(id,d){return logsFor(id).includes(d||today());}
+function habitStreak(id){
+  const set=new Set(logsFor(id));let n=0;let cur=today();
+  if(!set.has(cur))cur=addDays(cur,-1);
+  while(set.has(cur)){n++;cur=addDays(cur,-1);}
+  return n;
+}
+function weekMarks(id){
+  const set=new Set(logsFor(id));const out=[];
+  for(let i=6;i>=0;i--)out.push(set.has(addDays(today(),-i)));
+  return out;
+}
+async function toggleHabit(id){
+  const d=today();
+  if(habitDone(id,d)){
+    await sb.from('hq_habit_logs').delete().eq('habit_id',id).eq('on_date',d);
+    HLOGS=HLOGS.filter(l=>!(l.habit_id===id&&l.on_date===d));
+  }else{
+    const {error}=await sb.from('hq_habit_logs').insert({habit_id:id,on_date:d});
+    if(error){toast('Could not save');return;}
+    HLOGS.push({habit_id:id,on_date:d});
+    if(HABITS.every(h=>!h.active||habitDone(h.id,d))){confetti();toast('All done today 🔥');}
+  }
+  render();
+}
+
+/* ---- money helpers ---- */
+function ledgerTotals(rows){
+  const t={};rows.forEach(r=>{const c=r.currency||'—';t[c]=t[c]||{in:0,out:0};
+    t[c][r.direction==='in'?'in':'out']+=Number(r.amount||0);});
+  return t;
+}
+function goalSaved(g){
+  return LEDGER.filter(r=>r.goal_id===g.id).reduce((s,r)=>s+(r.direction==='in'?1:-1)*Number(r.amount||0),0);
+}
+
+/* ---- the directive engine ---- */
+function directive(){
+  const t=today();
+  const odDl=DEADLINES.filter(d=>!d.done&&d.due_on&&d.due_on<t).sort((a,b)=>a.due_on<b.due_on?-1:1);
+  if(odDl.length)return {k:'Overdue',h:odDl[0].title,p:`${relDay(odDl[0].due_on)}. ${odDl[0].note||'Clear it today.'}`,go:'russia'};
+
+  const expSoon=DOCS.filter(d=>d.expires_on&&daysBetween(t,d.expires_on)<=30).sort((a,b)=>a.expires_on<b.expires_on?-1:1);
+  if(expSoon.length)return {k:'Expiring',h:expSoon[0].name+' expires '+relDay(expSoon[0].expires_on),p:'Renew it before it lapses — this is the kind that bites quietly.',go:'russia'};
+
+  const dueDl=DEADLINES.filter(d=>!d.done&&d.due_on&&daysBetween(t,d.due_on)<=3&&d.due_on>=t);
+  if(dueDl.length)return {k:'Due soon',h:dueDl[0].title,p:`${relDay(dueDl[0].due_on)}. ${dueDl[0].note||''}`,go:'russia'};
+
+  const odCl=CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage));
+  if(odCl.length)return {k:'Follow up',h:odCl[0].name+' is waiting',p:`Follow-up was ${relDay(odCl[0].next_action_date)}. Money doesn't chase itself.`,go:'studio'};
+
+  const undone=HABITS.filter(h=>h.active&&!habitDone(h.id));
+  if(undone.length)return {k:'The grind',h:undone.map(h=>h.emoji+' '+h.name).join('  ·  '),p:`${undone.length} left today. ${habitStreak(undone[0].id)>0?'Streak on the line — '+habitStreak(undone[0].id)+' days.':'Start the streak.'}`,go:'grind'};
+
+  const doc=DOCS.filter(d=>d.status!=='done');
+  if(doc.length)return {k:'Moscow',h:doc[0].name,p:doc[0].note||'Next thing standing between you and the visa.',go:'russia'};
+
+  return {k:'Clear',h:'Nothing overdue. Nothing waiting.',p:'Everything tracked is on schedule. Go build something.',go:'money'};
+}
+
+/* ---- views ---- */
+function setView(v){
+  VIEW=v;localStorage.setItem('hq_view',v);
+  document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));
+  $('#v-'+v).classList.remove('hidden');
+  document.querySelectorAll('nav .nv').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  const fab=$('#add');
+  const map={today:['+ Task',()=>sheetDeadline(null)],russia:['+ Doc',()=>sheetDoc(null)],
+             money:['+ Entry',()=>sheetTxn(null)],grind:['+ Habit',()=>sheetHabit(null)],
+             studio:['+ Add',()=>openSheet(null)]};
+  const [label,fn]=map[v]||map.today;
+  fab.classList.remove('hidden');
+  fab.innerHTML=`<span class="p">+</span> ${label.replace('+ ','')}`;
+  fab.onclick=fn;
+  window.scrollTo({top:0,behavior:'smooth'});
+  render();
+}
+document.querySelectorAll('nav .nv').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+
+function render(){
+  $('#greet').textContent=`${partOfDay()}, Sahil 👋`;
+  const t=today();
+  const od=DEADLINES.filter(d=>!d.done&&d.due_on&&d.due_on<t).length
+          +CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage)).length;
+  const left=HABITS.filter(h=>h.active&&!habitDone(h.id)).length;
+  $('#sub-greet').textContent = od?`${od} thing${od>1?'s':''} overdue ⏰` : left?`${left} habit${left>1?'s':''} left today 🔥` : 'All clear — nothing overdue ✨';
+  renderStudio();
+  if(VIEW==='today')renderToday();
+  else if(VIEW==='russia')renderRussia();
+  else if(VIEW==='money')renderMoney();
+  else if(VIEW==='grind')renderGrind();
+}
+
+function renderToday(){
+  const d=directive();const t=today();
+  const soon=DEADLINES.filter(x=>!x.done).sort((a,b)=>(a.due_on||'9999')<(b.due_on||'9999')?-1:1).slice(0,6);
+  const clOd=CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage));
+  const hb=HABITS.filter(h=>h.active);
+  $('#v-today').innerHTML=
+   `<div class="hero">
+      <div class="k">${esc(d.k)}</div>
+      <h2>${esc(d.h)}</h2>
+      <p>${esc(d.p)}</p>
+      <button class="go" data-go="${d.go}">Take me there →</button>
+    </div>
+
+    <div class="sect"><h2>Today's grind</h2><span class="cnt">${hb.filter(h=>habitDone(h.id)).length}/${hb.length}</span></div>
+    <div class="list" id="t-hb">${hb.length?'':'<div class="empty" style="padding:26px">No habits yet — add one from the Grind tab.</div>'}</div>
+
+    <div class="sect"><h2>Deadline radar</h2><span class="cnt">${soon.length}</span></div>
+    <div class="list" id="t-dl">${soon.length?'':'<div class="empty" style="padding:26px">Nothing scheduled. 🎉</div>'}</div>
+
+    ${clOd.length?`<div class="sect"><h2>Clients waiting</h2><span class="cnt">${clOd.length}</span></div>
+    <div class="list">${clOd.map(c=>`<div class="ri"><div class="ico">💼</div><div class="mid"><div class="t1">${esc(c.name)}</div><div class="t2 bad">follow-up ${relDay(c.next_action_date)}</div></div></div>`).join('')}</div>`:''}`;
+
+  $('#v-today').querySelector('.go').onclick=()=>setView(d.go);
+
+  const hbBox=$('#t-hb');
+  hb.forEach(h=>{
+    const on=habitDone(h.id),st=habitStreak(h.id);
+    const n=el(`<div class="hb ${on?'on':''}">
+      <button class="ck">✓</button>
+      <div class="mid"><div class="nm">${esc(h.emoji||'')} ${esc(h.name)}</div>
+      <div class="wk">${weekMarks(h.id).map(f=>`<i class="${f?'f':''}"></i>`).join('')}</div></div>
+      ${st>0?`<div class="strk">🔥 ${st}</div>`:''}
+    </div>`);
+    n.querySelector('.ck').onclick=()=>toggleHabit(h.id);
+    hbBox.appendChild(n);
+  });
+
+  const dlBox=$('#t-dl');
+  soon.forEach(x=>{
+    const over=x.due_on&&x.due_on<t;
+    const n=el(`<div class="ri tap"><div class="ico">${areaEmoji(x.area)}</div>
+      <div class="mid"><div class="t1">${esc(x.title)}</div>
+      <div class="t2 ${over?'bad':''}">${x.due_on?relDay(x.due_on)+' · '+fmtDate(x.due_on):'no date'}</div></div>
+      <span class="pill ${over?'warn':'todo'}">${over?'overdue':'open'}</span></div>`);
+    n.onclick=()=>sheetDeadline(x);
+    dlBox.appendChild(n);
+  });
+}
+
+function renderRussia(){
+  const cur=Number(LIFE.visa_stage||4);
+  const done=DOCS.filter(d=>d.status==='done').length;
+  const groups={};DOCS.forEach(d=>{(groups[d.category||'other']=groups[d.category||'other']||[]).push(d);});
+  const order=['identity','education','medical','visa','other'];
+  const gname={identity:'🪪 Identity',education:'🎓 Education',medical:'🩺 Medical',visa:'🛂 Visa & arrival',other:'📦 Other'};
+
+  $('#v-russia').innerHTML=
+   `<div class="tile tap" id="r-stage">
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">Quota pipeline</div>
+        <div style="margin-left:auto;color:var(--mut);font-size:12.5px;font-weight:700">${esc(LIFE.reg_no||'')}</div>
+      </div>
+      <div class="steps">${VISA_STEPS.map(s=>
+        `<div class="s ${s.n<cur?'dn':s.n===cur?'cur':''}"><div class="n">${s.n<cur?'✓':s.n}</div><div class="lb">${s.l}</div></div>`).join('')}</div>
+      <p style="color:var(--mut);font-size:13px;font-weight:600;margin-top:12px;line-height:1.5">
+        ${cur<5?'Waiting on the enrolment order (приказ о зачислении). The визовое указание number cannot exist until stage 5 fires — you are early, not late.'
+               :cur<6?'Order issued. Указание takes ≥30 days at Minobrnauki — watch the Visa information field on the portal.'
+               :cur<7?'Указание number is out. Take it to the consulate. Do not book flights until it is in hand.'
+                     :'Visa issued. Single-entry, 90 days max — convert to multi-entry within 20 working days of expiry.'}
+      </p>
+      <div style="display:flex;gap:8px;margin-top:13px">
+        <div class="curcard" style="flex:1"><div class="c">PREP YEAR</div><div class="v" style="font-size:14.5px">${esc(LIFE.prep_uni||'—')}</div></div>
+        <div class="curcard" style="flex:1"><div class="c">DEGREE</div><div class="v" style="font-size:14.5px">${esc(LIFE.degree_uni||'—')}</div></div>
+      </div>
+    </div>
+
+    <div class="sect"><h2>Document vault</h2><span class="cnt">${done}/${DOCS.length} done</span></div>
+    <div id="r-docs"></div>`;
+
+  $('#r-stage').onclick=()=>sheetStage();
+  const box=$('#r-docs');
+  order.filter(k=>groups[k]).forEach(k=>{
+    box.appendChild(el(`<div class="sect" style="margin-top:18px"><h2 style="font-size:14.5px">${gname[k]}</h2></div>`));
+    const wrap=el(`<div class="list"></div>`);
+    groups[k].forEach(d=>{
+      const exp=d.expires_on?daysBetween(today(),d.expires_on):null;
+      const warn=exp!==null&&exp<=30;
+      const n=el(`<div class="ri tap">
+        <div class="ico">${d.status==='done'?'✅':d.status==='doing'?'⏳':'⬜'}</div>
+        <div class="mid"><div class="t1">${esc(d.name)}</div>
+          <div class="t2 ${warn?'bad':''}">${d.expires_on?('expires '+relDay(d.expires_on)):(d.note?esc(d.note).slice(0,58)+(d.note.length>58?'…':''):docStatusLabel(d.status))}</div></div>
+        <span class="pill ${d.status==='done'?'done':d.status==='doing'?'doing':warn?'warn':'todo'}">${docStatusLabel(d.status)}</span>
+      </div>`);
+      n.onclick=()=>sheetDoc(d);
+      wrap.appendChild(n);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+function renderMoney(){
+  const rows=LEDGER_FILTER==='all'?LEDGER:LEDGER.filter(r=>r.direction===LEDGER_FILTER);
+  const tot=ledgerTotals(LEDGER);
+  const goalsHTML=GOALS.map(g=>{
+    const s=goalSaved(g),pct=g.target_amount>0?Math.min(100,Math.round(s/g.target_amount*100)):0;
+    return `<div class="tile tap" data-goal="${g.id}" style="margin-bottom:11px">
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div style="font-weight:800;font-size:15.5px">${esc(g.name)}</div>
+        <div style="margin-left:auto;font-weight:800;font-size:15px">${money(s,g.currency)}</div>
+      </div>
+      <div class="bar ${pct>=100?'g':''}"><i style="width:${pct}%"></i></div>
+      <div style="display:flex;margin-top:7px;color:var(--mut);font-size:12.5px;font-weight:700">
+        <span>${pct}% of ${money(g.target_amount,g.currency)}</span>
+        <span style="margin-left:auto">${pct>=100?'funded ✅':money(Math.max(0,g.target_amount-s),g.currency)+' to go'}</span>
+      </div></div>`;}).join('');
+
+  $('#v-money').innerHTML=
+   `<div class="sect"><h2>Balances</h2><button class="act" id="m-exp">Export image</button></div>
+    <div class="grid2" id="m-cards">${
+      CUR_ALL.filter(c=>tot[c]).map(c=>{const v=tot[c].in-tot[c].out;
+        return `<div class="curcard"><div class="c">${c}</div><div class="v">${money(v,c)}</div>
+          <div class="d" style="color:var(--green-d)">+${money(tot[c].in,c)}</div>
+          <div class="d" style="color:var(--mut)">−${money(tot[c].out,c)}</div></div>`;}).join('')
+      ||'<div class="empty" style="grid-column:1/-1;padding:26px">No entries yet — tap ＋ to log money in or out.</div>'}</div>
+
+    ${GOALS.length?`<div class="sect"><h2>Goals</h2><button class="act" id="m-goal">+ Goal</button></div>${goalsHTML}`:''}
+
+    <div class="sect"><h2>Ledger</h2><span class="cnt">${LEDGER.length}</span></div>
+    <div class="seg" id="m-seg">
+      ${[['all','All'],['in','In'],['out','Out']].map(([k,l])=>`<button data-s="${k}" class="${LEDGER_FILTER===k?'on':''}">${l}</button>`).join('')}
+    </div>
+    <div class="tile" id="m-rows" style="padding:4px 14px"></div>`;
+
+  $('#m-seg').querySelectorAll('button').forEach(b=>b.onclick=()=>{LEDGER_FILTER=b.dataset.s;renderMoney();});
+  $('#m-exp').onclick=exportMoneyImage;
+  if($('#m-goal'))$('#m-goal').onclick=()=>sheetGoal(null);
+  $('#v-money').querySelectorAll('[data-goal]').forEach(x=>x.onclick=()=>sheetGoal(GOALS.find(g=>g.id===x.dataset.goal)));
+
+  const box=$('#m-rows');
+  if(!rows.length){box.innerHTML='<div class="empty" style="padding:26px">Nothing here yet.</div>';return;}
+  box.innerHTML='';
+  rows.slice(0,80).forEach(r=>{
+    const isIn=r.direction==='in';
+    const n=el(`<div class="mrow">
+      <div class="mi ${isIn?'in':'out'}">${isIn?'↓':'↑'}</div>
+      <div class="mid"><div class="t1">${esc(r.category||(isIn?'Income':'Expense'))}</div>
+        <div class="t2">${fmtDate(r.occurred_on)}${r.note?' · '+esc(r.note).slice(0,40):''}</div></div>
+      <div class="amt ${isIn?'in':'out'}">${isIn?'+':'−'}${money(r.amount,r.currency)}</div>
+    </div>`);
+    n.onclick=()=>sheetTxn(r);
+    box.appendChild(n);
+  });
+}
+
+function renderGrind(){
+  const hb=HABITS.filter(h=>h.active);
+  const w=WEIGHTS[0],prev=WEIGHTS[1];
+  const goalKg=Number(LIFE.weight_goal_kg||0);
+  const done7=d=>HLOGS.filter(l=>l.on_date>=daysAgo(6)).length;
+  $('#v-grind').innerHTML=
+   `<div class="tile tap" id="g-weight">
+      <div style="display:flex;align-items:baseline">
+        <div style="font-size:15.5px;font-weight:800">Weight</div>
+        <div style="margin-left:auto;font-size:26px;font-weight:800;letter-spacing:-.8px">${w?w.kg+' kg':'—'}</div>
+      </div>
+      <div style="color:var(--mut);font-size:12.5px;font-weight:700;margin-top:3px;display:flex">
+        <span>${w?'logged '+relDay(w.on_date):'tap to log your first weigh-in'}</span>
+        ${w&&prev?`<span style="margin-left:auto;color:${w.kg<prev.kg?'var(--green-d)':'var(--mut)'}">${w.kg<prev.kg?'▼':'▲'} ${Math.abs(w.kg-prev.kg).toFixed(1)} kg</span>`:''}
+      </div>
+      ${goalKg&&w?`<div class="bar g"><i style="width:${Math.min(100,Math.max(0,Math.round((1-(w.kg-goalKg)/Math.max(1,(WEIGHTS[WEIGHTS.length-1]?.kg||w.kg)-goalKg))*100)))}%"></i></div>
+      <div style="color:var(--mut);font-size:12px;font-weight:700;margin-top:6px">goal ${goalKg} kg · ${(w.kg-goalKg).toFixed(1)} kg to go</div>`:''}
+    </div>
+
+    <div class="sect"><h2>Habits</h2><span class="cnt">${hb.filter(h=>habitDone(h.id)).length}/${hb.length} today</span></div>
+    <div class="list" id="g-hb">${hb.length?'':'<div class="empty" style="padding:30px">No habits yet.<br>Tap ＋ to add the first one.</div>'}</div>
+
+    <div class="sect"><h2>Last 7 days</h2><span class="cnt">${done7()} check-ins</span></div>
+    <div class="tile"><div style="display:flex;gap:5px">
+      ${Array.from({length:7},(_,i)=>{const d=addDays(today(),-(6-i));
+        const c=HLOGS.filter(l=>l.on_date===d).length,tt=hb.length||1;
+        const pc=Math.min(1,c/tt);
+        return `<div style="flex:1;text-align:center">
+          <div style="height:52px;display:flex;align-items:flex-end"><div style="width:100%;border-radius:7px;background:${pc?'linear-gradient(180deg,#9b6dff,#6d5efc)':'var(--card2)'};height:${Math.max(8,pc*52)}px"></div></div>
+          <div style="font-size:10px;font-weight:800;color:var(--mut);margin-top:5px">${new Date(d+'T00:00:00').toLocaleDateString(undefined,{weekday:'narrow'})}</div>
+        </div>`;}).join('')}
+    </div></div>`;
+
+  $('#g-weight').onclick=()=>sheetWeight();
+  const box=$('#g-hb');
+  hb.forEach(h=>{
+    const on=habitDone(h.id),st=habitStreak(h.id);
+    const n=el(`<div class="hb ${on?'on':''}">
+      <button class="ck">✓</button>
+      <div class="mid"><div class="nm">${esc(h.emoji||'')} ${esc(h.name)}</div>
+        <div class="wk">${weekMarks(h.id).map(f=>`<i class="${f?'f':''}"></i>`).join('')}</div></div>
+      ${st>0?`<div class="strk">🔥 ${st}</div>`:''}
+      <button class="ck" style="border:none;background:none;color:var(--mut);width:26px" data-edit="1">⋯</button>
+    </div>`);
+    n.querySelector('.ck').onclick=()=>toggleHabit(h.id);
+    n.querySelector('[data-edit]').onclick=e=>{e.stopPropagation();sheetHabit(h);};
+    box.appendChild(n);
+  });
+}
+
+/* ---- sheets ---- */
+function sheetStage(){
+  const cur=Number(LIFE.visa_stage||4);
+  openForm({title:'Pipeline stage',emoji:'🇷🇺',color:'#6d5efc',
+    fields:fld('Current stage',`<select id="k-st">${VISA_STEPS.map(s=>`<option value="${s.n}" ${s.n===cur?'selected':''}>${s.n} — ${s.l}</option>`).join('')}</select>`)
+      +fld('Registration no.',`<input id="k-reg" value="${esc(LIFE.reg_no||'')}">`)
+      +fld('Prep university',`<input id="k-prep" value="${esc(LIFE.prep_uni||'')}">`)
+      +fld('Degree university',`<input id="k-deg" value="${esc(LIFE.degree_uni||'')}">`),
+    save:async()=>{
+      const data={...LIFE,visa_stage:Number($('#k-st').value),reg_no:$('#k-reg').value.trim(),
+        prep_uni:$('#k-prep').value.trim(),degree_uni:$('#k-deg').value.trim()};
+      const {error}=await sb.from('hq_life').upsert({id:'main',data,updated_at:new Date().toISOString()},{onConflict:'id'});
+      if(error)throw error; LIFE=data;
+    }});
+}
+
+function sheetDoc(d){
+  const isNew=!d;d=d||{status:'todo',category:'visa'};
+  openForm({title:isNew?'New document':'Document',emoji:'📄',color:'#3b9dff',
+    fields:fld('Name',`<input id="k-n" value="${esc(d.name||'')}" placeholder="e.g. HIV certificate">`)
+      +`<div class="row2">${fld('Status',`<select id="k-s">${DOC_STATUS.map(([v,l])=>`<option value="${v}" ${v===d.status?'selected':''}>${l}</option>`).join('')}</select>`)}
+        ${fld('Category',`<select id="k-c">${['identity','education','medical','visa','other'].map(v=>`<option value="${v}" ${v===d.category?'selected':''}>${v}</option>`).join('')}</select>`)}</div>`
+      +`<div class="row2">${fld('Expires on',`<input id="k-e" type="date" value="${d.expires_on||''}">`)}
+        ${fld('Cost',`<input id="k-cost" type="number" inputmode="decimal" value="${d.cost??''}">`)}</div>`
+      +fld('Currency',`<select id="k-cur"><option value="">—</option>${CUR_ALL.map(c=>`<option value="${c}" ${c===d.currency?'selected':''}>${c}</option>`).join('')}</select>`)
+      +fld('Notes',`<textarea id="k-note">${esc(d.note||'')}</textarea>`),
+    save:async()=>{
+      const rec={name:$('#k-n').value.trim(),status:$('#k-s').value,category:$('#k-c').value,
+        expires_on:$('#k-e').value||null,cost:$('#k-cost').value?Number($('#k-cost').value):null,
+        currency:$('#k-cur').value||null,note:$('#k-note').value.trim()||null};
+      if(!rec.name){toast('Name it first');return false;}
+      const {error}=isNew?await sb.from('hq_docs').insert(rec):await sb.from('hq_docs').update(rec).eq('id',d.id);
+      if(error)throw error;
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_docs').delete().eq('id',d.id);if(error)throw error;}});
+}
+
+function sheetDeadline(x){
+  const isNew=!x;x=x||{area:'russia',done:false};
+  openForm({title:isNew?'New task':'Task',emoji:'⏰',color:'#f5a524',
+    fields:fld('What',`<input id="k-t" value="${esc(x.title||'')}" placeholder="e.g. Chase РГАИС">`)
+      +`<div class="row2">${fld('Due',`<input id="k-d" type="date" value="${x.due_on||''}">`)}
+        ${fld('Area',`<select id="k-a">${AREAS.map(([v,l])=>`<option value="${v}" ${v===x.area?'selected':''}>${l}</option>`).join('')}</select>`)}</div>`
+      +fld('Notes',`<textarea id="k-note">${esc(x.note||'')}</textarea>`)
+      +(isNew?'':`<button class="btn ${x.done?'ghost':'green'}" id="k-done" style="margin-top:14px">${x.done?'Reopen':'Mark done ✓'}</button>`),
+    save:async()=>{
+      const rec={title:$('#k-t').value.trim(),due_on:$('#k-d').value||null,area:$('#k-a').value,note:$('#k-note').value.trim()||null};
+      if(!rec.title){toast('Give it a title');return false;}
+      const {error}=isNew?await sb.from('hq_deadlines').insert(rec):await sb.from('hq_deadlines').update(rec).eq('id',x.id);
+      if(error)throw error;
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_deadlines').delete().eq('id',x.id);if(error)throw error;}});
+  if(!isNew)$('#k-done').onclick=async()=>{
+    await sb.from('hq_deadlines').update({done:!x.done}).eq('id',x.id);
+    document.querySelector('.modal-bg').remove();
+    if(!x.done)confetti();
+    toast(x.done?'Reopened':'Done ✓');load();
+  };
+}
+
+function sheetTxn(r){
+  const isNew=!r;r=r||{direction:'out',currency:'OMR',occurred_on:today()};
+  const catsFor=dir=>(dir==='in'?CATS_IN:CATS_OUT);
+  openForm({title:isNew?'New entry':'Entry',emoji:'💰',color:'#1fb571',
+    fields:`<div class="seg" id="k-dir">${[['out','Money out'],['in','Money in']].map(([v,l])=>`<button data-d="${v}" class="${r.direction===v?'on':''}">${l}</button>`).join('')}</div>`
+      +`<div class="row2">${fld('Amount',`<input id="k-a" type="number" inputmode="decimal" value="${r.amount??''}" placeholder="0">`)}
+        ${fld('Currency',`<select id="k-cur">${CUR_ALL.map(c=>`<option value="${c}" ${c===r.currency?'selected':''}>${c}</option>`).join('')}</select>`)}</div>`
+      +`<div class="row2">${fld('Date',`<input id="k-d" type="date" value="${r.occurred_on||today()}">`)}
+        ${fld('Category',`<select id="k-c"></select>`)}</div>`
+      +(GOALS.length?fld('Count toward goal',`<select id="k-g"><option value="">—</option>${GOALS.map(g=>`<option value="${g.id}" ${g.id===r.goal_id?'selected':''}>${esc(g.name)}</option>`).join('')}</select>`):'')
+      +fld('Note',`<input id="k-note" value="${esc(r.note||'')}" placeholder="optional">`),
+    save:async()=>{
+      const rec={direction:dir,amount:Number($('#k-a').value||0),currency:$('#k-cur').value,
+        occurred_on:$('#k-d').value||today(),category:$('#k-c').value||null,
+        goal_id:($('#k-g')&&$('#k-g').value)||null,note:$('#k-note').value.trim()||null};
+      if(!rec.amount){toast('Enter an amount');return false;}
+      const {error}=isNew?await sb.from('hq_ledger').insert(rec):await sb.from('hq_ledger').update(rec).eq('id',r.id);
+      if(error)throw error;
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_ledger').delete().eq('id',r.id);if(error)throw error;}});
+  let dir=r.direction;
+  const fillCats=()=>{$('#k-c').innerHTML=catsFor(dir).map(c=>`<option value="${c}" ${c===r.category?'selected':''}>${c}</option>`).join('');};
+  fillCats();
+  $('#k-dir').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    dir=b.dataset.d;$('#k-dir').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.d===dir));fillCats();});
+}
+
+function sheetGoal(g){
+  const isNew=!g;g=g||{currency:'USD'};
+  openForm({title:isNew?'New goal':'Goal',emoji:'🎯',color:'#9b6dff',
+    fields:fld('Name',`<input id="k-n" value="${esc(g.name||'')}" placeholder="e.g. Moscow arrival fund">`)
+      +`<div class="row2">${fld('Target',`<input id="k-t" type="number" inputmode="decimal" value="${g.target_amount??''}">`)}
+        ${fld('Currency',`<select id="k-cur">${CUR_ALL.map(c=>`<option value="${c}" ${c===g.currency?'selected':''}>${c}</option>`).join('')}</select>`)}</div>`
+      +fld('Note',`<textarea id="k-note">${esc(g.note||'')}</textarea>`),
+    save:async()=>{
+      const rec={name:$('#k-n').value.trim(),target_amount:Number($('#k-t').value||0),currency:$('#k-cur').value,note:$('#k-note').value.trim()||null};
+      if(!rec.name){toast('Name it first');return false;}
+      const {error}=isNew?await sb.from('hq_goals').insert(rec):await sb.from('hq_goals').update(rec).eq('id',g.id);
+      if(error)throw error;
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_goals').delete().eq('id',g.id);if(error)throw error;}});
+}
+
+function sheetHabit(h){
+  const isNew=!h;h=h||{emoji:'✅',per_week:7,area:'study',active:true};
+  openForm({title:isNew?'New habit':'Habit',emoji:'🔥',color:'#f5a524',
+    fields:`<div class="row2">${fld('Emoji',`<input id="k-e" value="${esc(h.emoji||'✅')}" maxlength="4">`)}
+        ${fld('Days / week',`<input id="k-w" type="number" min="1" max="7" value="${h.per_week||7}">`)}</div>`
+      +fld('Name',`<input id="k-n" value="${esc(h.name||'')}" placeholder="e.g. Russian study">`)
+      +fld('Area',`<select id="k-a">${AREAS.map(([v,l])=>`<option value="${v}" ${v===h.area?'selected':''}>${l}</option>`).join('')}</select>`),
+    save:async()=>{
+      const rec={name:$('#k-n').value.trim(),emoji:$('#k-e').value.trim()||'✅',
+        per_week:Number($('#k-w').value||7),area:$('#k-a').value,active:true};
+      if(!rec.name){toast('Name it first');return false;}
+      const {error}=isNew?await sb.from('hq_habits').insert(rec):await sb.from('hq_habits').update(rec).eq('id',h.id);
+      if(error)throw error;
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_habits').delete().eq('id',h.id);if(error)throw error;}});
+}
+
+function sheetWeight(){
+  const last=WEIGHTS[0];
+  openForm({title:'Log weight',emoji:'⚖️',color:'#12b6c9',
+    fields:`<div class="row2">${fld('Weight (kg)',`<input id="k-kg" type="number" inputmode="decimal" step="0.1" value="${last?last.kg:''}">`)}
+      ${fld('Date',`<input id="k-d" type="date" value="${today()}">`)}</div>`
+      +fld('Goal weight (kg)',`<input id="k-goal" type="number" inputmode="decimal" value="${LIFE.weight_goal_kg||''}">`),
+    save:async()=>{
+      const kg=Number($('#k-kg').value||0);
+      if(!kg){toast('Enter a weight');return false;}
+      const {error}=await sb.from('hq_weight').upsert({on_date:$('#k-d').value||today(),kg},{onConflict:'on_date'});
+      if(error)throw error;
+      const gk=Number($('#k-goal').value||0);
+      if(gk!==Number(LIFE.weight_goal_kg||0)){
+        const data={...LIFE,weight_goal_kg:gk};
+        await sb.from('hq_life').upsert({id:'main',data,updated_at:new Date().toISOString()},{onConflict:'id'});
+        LIFE=data;
+      }
+    }});
+}
+
+/* ---- export money summary as image ---- */
+async function exportMoneyImage(){
+  toast('Building image…');
+  try{ await loadHtml2pdf(); }catch(e){ toast('Blocked on this network'); return; }
+  if(!window.html2canvas){toast('Image export unavailable');return;}
+  const tot=ledgerTotals(LEDGER);
+  const goalRows=GOALS.map(g=>{const s=goalSaved(g),p=g.target_amount>0?Math.min(100,Math.round(s/g.target_amount*100)):0;
+    return `<div style="margin-top:14px"><div style="display:flex;font-size:15px;font-weight:700"><span>${esc(g.name)}</span><span style="margin-left:auto">${money(s,g.currency)} / ${money(g.target_amount,g.currency)}</span></div>
+      <div style="height:10px;border-radius:10px;background:#eee;margin-top:7px;overflow:hidden"><div style="height:100%;width:${p}%;background:linear-gradient(90deg,#6d5efc,#9b6dff)"></div></div></div>`;}).join('');
+  const holder=document.createElement('div');
+  holder.style.cssText='position:fixed;left:-9999px;top:0;';
+  holder.innerHTML=`<div style="width:680px;padding:44px;background:#f6f4ef;font-family:Arial,Helvetica,sans-serif;color:#2a2620;box-sizing:border-box">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.6px;color:#948c7e">WEEBJI HQ · MONEY</div>
+      <div style="font-size:30px;font-weight:800;letter-spacing:-.8px;margin-top:7px">${new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'})}</div>
+      <div style="display:flex;gap:14px;margin-top:26px;flex-wrap:wrap">
+        ${CUR_ALL.filter(c=>tot[c]).map(c=>{const v=tot[c].in-tot[c].out;
+          return `<div style="flex:1;min-width:140px;background:#fff;border:1px solid #ece7dd;border-radius:16px;padding:16px">
+            <div style="font-size:11px;font-weight:800;color:#948c7e;letter-spacing:1px">${c}</div>
+            <div style="font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-.6px">${money(v,c)}</div>
+            <div style="font-size:12px;font-weight:700;color:#149a5f;margin-top:4px">+${money(tot[c].in,c)}</div>
+            <div style="font-size:12px;font-weight:700;color:#948c7e">−${money(tot[c].out,c)}</div>
+          </div>`;}).join('')||'<div style="color:#948c7e">No entries yet</div>'}
+      </div>
+      ${goalRows?`<div style="margin-top:30px;background:#fff;border:1px solid #ece7dd;border-radius:16px;padding:20px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:1.2px;color:#948c7e">GOALS</div>${goalRows}</div>`:''}
+      <div style="margin-top:28px;color:#b6ad9d;font-size:12px">${LEDGER.length} entries tracked</div>
+    </div>`;
+  document.body.appendChild(holder);
+  try{
+    const canvas=await window.html2canvas(holder.firstElementChild,{scale:2,backgroundColor:'#f6f4ef',useCORS:true});
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+    const name='weebji-money-'+today()+'.png';
+    const file=new File([blob],name,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Money'}).catch(()=>{});}
+    else{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+  }catch(e){toast('Image failed');}
   holder.remove();
 }
 
