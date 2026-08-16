@@ -289,6 +289,70 @@
   .curcard .v{font-size:19px;font-weight:800;letter-spacing:-.5px;margin-top:3px}
   .curcard .d{font-size:11.5px;font-weight:700;margin-top:3px}
 
+  /* ---- the arc ---- */
+  .mhead{display:flex;align-items:baseline;gap:9px}
+  .mhead .t{font-size:15.5px;font-weight:800;letter-spacing:-.3px}
+  .mhead .pc{margin-left:auto;font-size:27px;font-weight:800;letter-spacing:-.9px;line-height:1}
+  .msub{color:var(--mut);font-size:12.5px;font-weight:700;margin-top:8px;display:flex;gap:8px}
+  .msub .rt{margin-left:auto;color:var(--green-d)}
+  .bnote{color:var(--mut);font-size:12.5px;font-weight:600;line-height:1.5;margin-top:11px}
+
+  /* weekly quota rows */
+  .qrow{display:flex;align-items:center;gap:11px;margin-top:9px}
+  .qrow .lb{width:34px;font-size:13px;font-weight:800;color:var(--ink2);flex-shrink:0}
+  .qrow .dots{display:flex;gap:6px;margin-right:auto}
+  .qrow .dots i{width:12px;height:12px;border-radius:50%;background:var(--card2);transition:background .2s}
+  .qrow .dots i.f{background:var(--green)}
+  .qrow .dots i.rest.f{background:var(--teal)}
+  .qrow .n{font-size:12.5px;font-weight:800;color:var(--mut);flex-shrink:0}
+
+  /* today's three taps */
+  .body3{display:flex;gap:9px;margin-top:15px}
+  .body3 button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;
+    border-radius:15px;background:var(--card2);font-weight:800;font-size:12.5px;color:var(--ink2);
+    box-shadow:0 3px 0 #e2ddd2;transition:all .14s cubic-bezier(.2,1.3,.4,1)}
+  .body3 button .e{font-size:21px;line-height:1.1}
+  .body3 button:active{transform:translateY(3px);box-shadow:0 0 0 #e2ddd2}
+  .body3 button.on{background:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-d)}
+  .body3 button.rest.on{background:var(--teal);box-shadow:0 3px 0 #0d90a1}
+
+  /* language ladder */
+  .lad{margin-top:16px;border-top:1px solid var(--line)}
+  .lad .st{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);transition:opacity .15s}
+  .lad .st:last-child{border-bottom:none}
+  .lad .st:active{opacity:.55}
+  .lad .st .dot{width:23px;height:23px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+    font-size:11px;font-weight:800;background:var(--card2);color:var(--mut);margin-top:1px}
+  .lad .st.dn .dot{background:var(--green);color:#fff}
+  .lad .st.cur .dot{background:var(--primary);color:#fff;box-shadow:0 0 0 4px #efecff}
+  .lad .st .t{font-weight:800;font-size:14px}
+  .lad .st.dn .t{color:var(--mut)}
+  .lad .st .d{color:var(--mut);font-size:12.3px;font-weight:600;margin-top:1px;line-height:1.45}
+
+  /* 28-day % on habit rows (replaces the streak counter) */
+  .hb .pc28{font-size:14px;font-weight:800;color:var(--primary);flex-shrink:0}
+  .hb.on .pc28{color:var(--green-d)}
+  .hb .ck.edit{border:none;background:none;color:var(--mut);width:26px}
+
+  /* progress photos */
+  .pstrip{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px}
+  .pstrip::-webkit-scrollbar{display:none}
+  .pstrip .ph{width:88px;flex-shrink:0}
+  .pstrip .ph img{width:88px;height:118px;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:var(--card2);display:block}
+  .pstrip .ph .dt{font-size:10.5px;font-weight:800;color:var(--mut);text-align:center;margin-top:5px}
+  .pstrip .add{width:88px;height:118px;flex-shrink:0;border-radius:14px;border:2px dashed #ddd6c8;
+    background:var(--card);display:grid;place-items:center;font-size:26px;color:var(--mut)}
+
+  /* blocked readiness rows */
+  .ri.dim{opacity:.62;box-shadow:none;background:var(--card2)}
+
+  /* studio parked */
+  .park{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 17px;
+    box-shadow:var(--shadow);margin:8px 4px 14px}
+  .park .h{font-size:15.5px;font-weight:800;letter-spacing:-.3px}
+  .park p{color:var(--mut);font-size:13px;font-weight:600;line-height:1.55;margin-top:7px}
+  .park p.m{font-size:12.3px}
+
   /* seg control */
   .seg{display:flex;background:var(--card2);border-radius:14px;padding:4px;gap:3px;margin:2px 0 4px}
   .seg button{flex:1;padding:9px 6px;border-radius:11px;font-weight:800;font-size:13.5px;color:var(--mut);background:none;transition:all .15s}
@@ -331,6 +395,7 @@
     <div class="view hidden" id="v-money"></div>
     <div class="view hidden" id="v-grind"></div>
     <div class="view hidden" id="v-studio">
+      <div id="studio-park"></div>
       <div class="chips" id="chips"></div>
       <div class="filters" id="filters"></div>
       <div class="list" id="list"></div>
@@ -383,7 +448,23 @@ const DOC_STATUS=[['todo','Not started'],['doing','In progress'],['done','Done']
 const AREAS=[['russia','🇷🇺 Russia'],['study','📚 Study'],['weebji','⚡ Weebji'],['health','🏋️ Health'],['money','💰 Money'],['studio','💼 Studio']];
 const CATS_IN=['Client payment','Play Store','Family','Other income'];
 const CATS_OUT=['Translations','Medicals','Visa & travel','Food','Subscriptions','Other'];
+
+/* ---- the arc: body rotation + language ladder ---- */
+const BODY_KINDS=[['lift','🏋️','Lift'],['run','🏃','Run'],['rest','😌','Rest']];
+const WEEK_QUOTA={lift:3,run:3,rest:1};
+// A lapse is 4+ consecutive missed days. Two quiet days is a normal week;
+// four is the start of the collapse this whole module exists to interrupt.
+const LAPSE_DAYS=4;
+const RU_LADDER=[
+  ['Cyrillic','Read any Russian word aloud without decoding it letter by letter.'],
+  ['Survival phrases','Order food, ask directions, buy a ticket, say what you need.'],
+  ['A1','Introduce yourself, present tense, numbers, time, basic questions.'],
+  ['A2','Past and future, everyday conversation, follow a slow explanation.'],
+  ['ТРКИ-1','The entry bar for the Russian-taught degree. This is the real target.']
+];
+
 let LEDGER=[], GOALS=[], DOCS=[], DEADLINES=[], HABITS=[], HLOGS=[], WEIGHTS=[], LIFE={};
+let BODY=[], READY=[], PHOTOS=[], PHOTO_URLS={};
 let VIEW=localStorage.getItem('hq_view')||'today';
 let LEDGER_FILTER='all';
 
@@ -427,7 +508,7 @@ sb.auth.onAuthStateChange((_e,s)=>{if(s&&$('#app').classList.contains('hidden'))
 
 /* ---------- data ---------- */
 async function load(){
-  const [clientsRes, stRes, ledRes, goalRes, docRes, dlRes, hbRes, hlRes, wtRes, lifeRes] = await Promise.all([
+  const [clientsRes, stRes, ledRes, goalRes, docRes, dlRes, hbRes, hlRes, wtRes, lifeRes, bdRes, rdRes, phRes] = await Promise.all([
     sb.from('hq_clients').select('*').order('created_at',{ascending:false}),
     sb.from('hq_settings').select('*').eq('id','main').maybeSingle(),
     sb.from('hq_ledger').select('*').order('occurred_on',{ascending:false}).limit(400),
@@ -437,12 +518,16 @@ async function load(){
     sb.from('hq_habits').select('*').order('sort'),
     sb.from('hq_habit_logs').select('*').gte('on_date',daysAgo(120)),
     sb.from('hq_weight').select('*').order('on_date',{ascending:false}).limit(90),
-    sb.from('hq_life').select('*').eq('id','main').maybeSingle()
+    sb.from('hq_life').select('*').eq('id','main').maybeSingle(),
+    sb.from('hq_body_log').select('*').gte('on_date',daysAgo(200)).order('on_date',{ascending:false}),
+    sb.from('hq_ready').select('*').order('sort'),
+    sb.from('hq_photos').select('*').order('on_date',{ascending:false}).limit(60)
   ]);
   if(clientsRes.error){toast('Couldn\'t load');return;}
   CLIENTS=clientsRes.data||[]; SETTINGS=stRes.data||SETTINGS||{};
   LEDGER=ledRes.data||[]; GOALS=goalRes.data||[]; DOCS=docRes.data||[]; DEADLINES=dlRes.data||[];
   HABITS=hbRes.data||[]; HLOGS=hlRes.data||[]; WEIGHTS=wtRes.data||[]; LIFE=(lifeRes.data&&lifeRes.data.data)||{};
+  BODY=bdRes.data||[]; READY=rdRes.data||[]; PHOTOS=phRes.data||[];
   render();
 }
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
@@ -461,6 +546,15 @@ function renderStudio(){
   const active=CLIENTS.filter(c=>!['paid','lost'].includes(c.stage));
   const overdue=CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<today()&&!['paid','lost'].includes(c.stage)).length;
   const coll={};CLIENTS.forEach(c=>{if(Number(c.amount_paid)>0){const k=c.currency||'';coll[k]=(coll[k]||0)+Number(c.amount_paid);}});
+
+  // Parked until Moscow. The tab stays readable — the history and the Barbaros
+  // case study are the portfolio proof — but nothing here chases him.
+  $('#studio-park').innerHTML=studioParked()
+    ?`<div class="park">
+        <div class="h">⏸ Parked until Moscow</div>
+        <p>Oman operations closed with the Barbaros retainer. Nothing here will chase you before you fly — no follow-up reminders, no directives.</p>
+        <p class="m">The 10.5K-follower account and a real paying retainer stay on record as portfolio proof. Un-park it from the Russia tab when you land.</p>
+      </div>`:'';
 
   // chips
   const collStr=Object.keys(coll).length?Object.entries(coll).map(([k,v])=>money(v,k)).join(' · '):'nothing yet';
@@ -832,6 +926,9 @@ function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+
 function relDay(d){if(!d)return '';const n=daysBetween(today(),d);
   if(n===0)return 'today';if(n===1)return 'tomorrow';if(n===-1)return 'yesterday';
   if(n<0)return Math.abs(n)+'d overdue';return 'in '+n+'d';}
+// relDay() is deadline language and says "2d overdue". Never use it for
+// something optional like a weigh-in — nothing here is owed.
+function agoDay(d){const n=daysBetween(d,today());return n===0?'today':n===1?'yesterday':n+' days ago';}
 function docStatusLabel(s){return (DOC_STATUS.find(x=>x[0]===s)||DOC_STATUS[0])[1];}
 function areaEmoji(a){const f=AREAS.find(x=>x[0]===a);return f?f[1].split(' ')[0]:'•';}
 
@@ -867,12 +964,6 @@ const fld=(label,inner)=>`<div class="fg"><div class="lbl">${label}</div>${inner
 /* ---- habits ---- */
 const logsFor=id=>HLOGS.filter(l=>l.habit_id===id).map(l=>l.on_date);
 function habitDone(id,d){return logsFor(id).includes(d||today());}
-function habitStreak(id){
-  const set=new Set(logsFor(id));let n=0;let cur=today();
-  if(!set.has(cur))cur=addDays(cur,-1);
-  while(set.has(cur)){n++;cur=addDays(cur,-1);}
-  return n;
-}
 function weekMarks(id){
   const set=new Set(logsFor(id));const out=[];
   for(let i=6;i>=0;i--)out.push(set.has(addDays(today(),-i)));
@@ -891,6 +982,88 @@ async function toggleHabit(id){
   }
   render();
 }
+
+/* ================= THE ARC =================
+   Everything below is built on one rule: a missed day is a shrug, not a reset.
+   That is why the hero metric is a 28-day window and not a streak — there is
+   no number here that a bad week can take away from him. */
+
+// Share of the last 28 days that got a check. One miss moves this ~3.5 points
+// and it can never hit zero from a single bad stretch.
+function fill28(dates){
+  const set=new Set(dates);let n=0;
+  for(let i=0;i<28;i++) if(set.has(addDays(today(),-i))) n++;
+  return {done:n,pct:Math.round(n/28*100)};
+}
+
+// How many times he came back after going quiet. Counting returns makes a
+// restart the tracked win instead of the thing that proves he failed.
+function comebacks(dates){
+  const set=new Set(dates);let n=0,gap=0,started=false;
+  for(let i=180;i>=0;i--){
+    if(set.has(addDays(today(),-i))){
+      // The empty stretch before the very first entry is not a lapse — a habit
+      // he hadn't started yet must never read as one he abandoned.
+      if(started&&gap>=LAPSE_DAYS)n++;
+      started=true;gap=0;
+    }else if(started)gap++;
+  }
+  return n;
+}
+
+// Monday of the current week, in local time (see the ymd() note above).
+function weekStart(){
+  const d=new Date(today()+'T00:00:00');
+  return addDays(today(),-((d.getDay()+6)%7));
+}
+
+/* ---- body: 3 lift · 3 run · 1 rest, any order ---- */
+const bodyDates=()=>BODY.map(b=>b.on_date);
+function bodyOn(d){const r=BODY.find(b=>b.on_date===(d||today()));return r?r.kind:null;}
+function bodyWeek(){
+  const ws=weekStart();
+  const c={lift:0,run:0,rest:0};
+  BODY.filter(b=>b.on_date>=ws&&b.on_date<=addDays(ws,6)).forEach(b=>{c[b.kind]=(c[b.kind]||0)+1;});
+  // Rest is the seventh slot, not a gap. Once both training quotas are met it
+  // is earned whether or not he remembered to tap it.
+  const earned=c.lift>=WEEK_QUOTA.lift&&c.run>=WEEK_QUOTA.run;
+  const rest=earned||c.rest>0;
+  return {...c,restEarned:rest,
+    slots:Math.min(WEEK_QUOTA.lift,c.lift)+Math.min(WEEK_QUOTA.run,c.run)+(rest?1:0)};
+}
+// What the week still wants. Never phrased as a debt.
+function bodyNeeds(){
+  const w=bodyWeek();
+  if(w.lift<WEEK_QUOTA.lift) return 'lift';
+  if(w.run<WEEK_QUOTA.run) return 'run';
+  return 'rest';
+}
+async function logBody(kind){
+  const d=today();
+  if(bodyOn(d)===kind){
+    await sb.from('hq_body_log').delete().eq('on_date',d);
+    BODY=BODY.filter(b=>b.on_date!==d);
+  }else{
+    const {error}=await sb.from('hq_body_log').upsert({on_date:d,kind},{onConflict:'on_date'});
+    if(error){toast('Could not save');return;}
+    BODY=BODY.filter(b=>b.on_date!==d);BODY.unshift({on_date:d,kind});
+    if(bodyWeek().slots>=7){confetti();toast('Full week — 3 lift, 3 run, rest taken 💪');}
+  }
+  render();
+}
+
+/* ---- readiness ---- */
+// Blocked items are waiting on Minobrnauki, РГАИС, or a date that has not
+// arrived. They are excluded from the meter on purpose: this number must only
+// ever measure what he actually controls, or it becomes a guilt counter for
+// someone else's paperwork speed.
+function readiness(phase){
+  const rows=READY.filter(r=>r.phase===(phase||'pre')&&!r.blocked);
+  const done=rows.filter(r=>r.status==='done').length;
+  return {done,total:rows.length,pct:rows.length?Math.round(done/rows.length*100):0};
+}
+const studioParked=()=>LIFE.studio_parked!==false;
+const activePhase=()=>LIFE.arrived?'arrival':'pre';
 
 /* ---- money helpers ---- */
 function ledgerTotals(rows){
@@ -914,16 +1087,40 @@ function directive(){
   const dueDl=DEADLINES.filter(d=>!d.done&&d.due_on&&daysBetween(t,d.due_on)<=3&&d.due_on>=t);
   if(dueDl.length)return {k:'Due soon',h:dueDl[0].title,p:`${relDay(dueDl[0].due_on)}. ${dueDl[0].note||''}`,go:'russia'};
 
-  const odCl=CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage));
-  if(odCl.length)return {k:'Follow up',h:odCl[0].name+' is waiting',p:`Follow-up was ${relDay(odCl[0].next_action_date)}. Money doesn't chase itself.`,go:'studio'};
+  // Translations are the one pre-departure task fully inside his control while
+  // everything else waits on the ministry. It nags until he STARTS it, then
+  // drops out — a task in progress doesn't need to be shouted at daily.
+  const tr=READY.find(r=>r.phase===activePhase()&&!r.blocked&&r.status==='todo'&&/translation/i.test(r.title));
+  if(tr)return {k:'Moscow',h:tr.title,p:'The only thing on the list that is fully yours right now. Everything else is waiting on them.',go:'russia'};
+
+  // Studio is parked until Moscow — no client nagging before departure.
+  if(!studioParked()){
+    const odCl=CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage));
+    if(odCl.length)return {k:'Follow up',h:odCl[0].name+' is waiting',p:`Follow-up was ${relDay(odCl[0].next_action_date)}. Money doesn't chase itself.`,go:'studio'};
+  }
+
+  if(!bodyOn(t)){
+    const w=bodyWeek(),need=bodyNeeds();
+    const left=6-daysBetween(weekStart(),t);
+    if(need==='rest')return {k:'Body',h:'😌 Rest day',p:'Three lifts and three runs are in. Rest is the seventh slot, not a gap — tap it and go be a person.',go:'grind'};
+    return {k:'Body',h:(need==='lift'?'🏋️ Lift':'🏃 Run')+' day',
+      p:`${w.lift}/3 lifts, ${w.run}/3 runs this week. ${left>0?left+(left>1?' days':' day')+' left to fill it — no rush.':'Last day of the week; whatever lands, lands.'}`,go:'grind'};
+  }
+
+  const ru=HABITS.find(h=>h.active&&/russian/i.test(h.name)&&!habitDone(h.id));
+  if(ru)return {k:'Russian',h:'🇷🇺 '+ru.name,p:`${fill28(logsFor(ru.id)).done} of the last 28 days. Ten minutes counts the same as an hour — the point is the tap.`,go:'grind'};
 
   const undone=HABITS.filter(h=>h.active&&!habitDone(h.id));
-  if(undone.length)return {k:'The grind',h:undone.map(h=>h.emoji+' '+h.name).join('  ·  '),p:`${undone.length} left today. ${habitStreak(undone[0].id)>0?'Streak on the line — '+habitStreak(undone[0].id)+' days.':'Start the streak.'}`,go:'grind'};
+  if(undone.length)return {k:'Small stuff',h:undone.map(h=>h.emoji+' '+h.name).join('  ·  '),
+    p:'Low-friction, thirty seconds. Then the day is fully clear.',go:'grind'};
+
+  const rd=READY.filter(r=>r.phase===activePhase()&&!r.blocked&&r.status!=='done');
+  if(rd.length)return {k:'Moscow',h:rd[0].title,p:rd[0].note||'Next thing on the list that is actually yours to move.',go:'russia'};
 
   const doc=DOCS.filter(d=>d.status!=='done');
   if(doc.length)return {k:'Moscow',h:doc[0].name,p:doc[0].note||'Next thing standing between you and the visa.',go:'russia'};
 
-  return {k:'Clear',h:'Nothing overdue. Nothing waiting.',p:'Everything tracked is on schedule. Go build something.',go:'money'};
+  return {k:'Clear',h:'Body done. Russian done. Nothing overdue.',p:'Everything you control is handled. The rest is Minobrnauki\'s move, not yours.',go:'money'};
 }
 
 /* ---- views ---- */
@@ -949,9 +1146,10 @@ function render(){
   $('#greet').textContent=`${partOfDay()}, Sahil 👋`;
   const t=today();
   const od=DEADLINES.filter(d=>!d.done&&d.due_on&&d.due_on<t).length
-          +CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage)).length;
-  const left=HABITS.filter(h=>h.active&&!habitDone(h.id)).length;
-  $('#sub-greet').textContent = od?`${od} thing${od>1?'s':''} overdue ⏰` : left?`${left} habit${left>1?'s':''} left today 🔥` : 'All clear — nothing overdue ✨';
+          +(studioParked()?0:CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage)).length);
+  const w=bodyWeek();
+  $('#sub-greet').textContent = od?`${od} thing${od>1?'s':''} overdue ⏰`
+    : `${w.slots}/7 slots this week · ${fill28(bodyDates()).pct}%`;
   renderStudio();
   if(VIEW==='today')renderToday();
   else if(VIEW==='russia')renderRussia();
@@ -972,8 +1170,9 @@ function renderToday(){
       <button class="go" data-go="${d.go}">Take me there →</button>
     </div>
 
-    <div class="sect"><h2>Today's grind</h2><span class="cnt">${hb.filter(h=>habitDone(h.id)).length}/${hb.length}</span></div>
-    <div class="list" id="t-hb">${hb.length?'':'<div class="empty" style="padding:26px">No habits yet — add one from the Grind tab.</div>'}</div>
+    <div class="sect"><h2>Today</h2><span class="cnt">${bodyWeek().slots}/7 slots</span></div>
+    <div class="tile" id="t-body"></div>
+    <div class="list" id="t-hb" style="margin-top:11px">${hb.length?'':'<div class="empty" style="padding:26px">No habits yet — add one from the Grind tab.</div>'}</div>
 
     <div class="sect"><h2>Deadline radar</h2><span class="cnt">${soon.length}</span></div>
     <div class="list" id="t-dl">${soon.length?'':'<div class="empty" style="padding:26px">Nothing scheduled. 🎉</div>'}</div>
@@ -983,18 +1182,9 @@ function renderToday(){
 
   $('#v-today').querySelector('.go').onclick=()=>setView(d.go);
 
+  paintBody($('#t-body'),true);
   const hbBox=$('#t-hb');
-  hb.forEach(h=>{
-    const on=habitDone(h.id),st=habitStreak(h.id);
-    const n=el(`<div class="hb ${on?'on':''}">
-      <button class="ck">✓</button>
-      <div class="mid"><div class="nm">${esc(h.emoji||'')} ${esc(h.name)}</div>
-      <div class="wk">${weekMarks(h.id).map(f=>`<i class="${f?'f':''}"></i>`).join('')}</div></div>
-      ${st>0?`<div class="strk">🔥 ${st}</div>`:''}
-    </div>`);
-    n.querySelector('.ck').onclick=()=>toggleHabit(h.id);
-    hbBox.appendChild(n);
-  });
+  hb.forEach(h=>hbBox.appendChild(habitRow(h)));
 
   const dlBox=$('#t-dl');
   soon.forEach(x=>{
@@ -1011,6 +1201,12 @@ function renderToday(){
 function renderRussia(){
   const cur=Number(LIFE.visa_stage||4);
   const done=DOCS.filter(d=>d.status==='done').length;
+  // Phase flips on arrival: the pre-departure list retires and the arrival
+  // list (registration, visa conversion, SNILS, bank) takes over.
+  const arrived=!!LIFE.arrived, phase=arrived?'arrival':'pre';
+  const rd=readiness(phase);
+  const mine=READY.filter(r=>r.phase===phase&&!r.blocked);
+  const blocked=READY.filter(r=>r.phase===phase&&r.blocked);
   const groups={};DOCS.forEach(d=>{(groups[d.category||'other']=groups[d.category||'other']||[]).push(d);});
   const order=['identity','education','medical','visa','other'];
   const gname={identity:'🪪 Identity',education:'🎓 Education',medical:'🩺 Medical',visa:'🛂 Visa & arrival',other:'📦 Other'};
@@ -1035,10 +1231,36 @@ function renderRussia(){
       </div>
     </div>
 
-    <div class="sect"><h2>Document vault</h2><span class="cnt">${done}/${DOCS.length} done</span></div>
+    <div class="sect"><h2>${arrived?'Arrival checklist':'Departure readiness'}</h2><button class="act" id="r-addready">+ Item</button></div>
+    <div class="tile">
+      <div class="mhead"><div class="t">${arrived?'Settling in':'What\'s actually yours'}</div><div class="pc">${rd.pct}%</div></div>
+      <div class="bar ${rd.pct>=100?'g':''}"><i style="width:${rd.pct}%"></i></div>
+      <div class="msub"><span>${rd.done} of ${rd.total} done</span>${blocked.length?`<span class="rt">${blocked.length} waiting on them</span>`:''}</div>
+      <div class="bnote">No date here on purpose. The flight can't be booked until the визовое указание number exists, so a countdown would only be counting someone else's paperwork.</div>
+    </div>
+    <div class="list" id="r-ready" style="margin-top:11px"></div>
+
+    ${blocked.length?`<div class="sect" style="margin-top:20px"><h2 style="font-size:14.5px">⏸ Waiting on them</h2><span class="cnt">not yours</span></div>
+    <div class="list" id="r-blocked"></div>`:''}
+
+    <div class="sect" style="margin-top:20px"><h2>Document vault</h2><span class="cnt">${done}/${DOCS.length} done</span></div>
     <div id="r-docs"></div>`;
 
   $('#r-stage').onclick=()=>sheetStage();
+
+  const readyRow=x=>{
+    const n=el(`<div class="ri tap ${x.blocked?'dim':''}">
+      <div class="ico">${x.blocked?'⏸':x.status==='done'?'✅':x.status==='doing'?'⏳':'⬜'}</div>
+      <div class="mid"><div class="t1">${esc(x.title)}</div>
+        ${x.note?`<div class="t2">${esc(x.note).slice(0,72)}${x.note.length>72?'…':''}</div>`:''}</div>
+      <span class="pill ${x.blocked?'todo':x.status==='done'?'done':x.status==='doing'?'doing':'todo'}">${x.blocked?'blocked':docStatusLabel(x.status)}</span>
+    </div>`);
+    n.onclick=()=>sheetReady(x);
+    return n;
+  };
+  $('#r-addready').onclick=()=>sheetReady(null,phase);
+  mine.forEach(x=>$('#r-ready').appendChild(readyRow(x)));
+  if($('#r-blocked'))blocked.forEach(x=>$('#r-blocked').appendChild(readyRow(x)));
   const box=$('#r-docs');
   order.filter(k=>groups[k]).forEach(k=>{
     box.appendChild(el(`<div class="sect" style="margin-top:18px"><h2 style="font-size:14.5px">${gname[k]}</h2></div>`));
@@ -1113,54 +1335,156 @@ function renderMoney(){
   });
 }
 
+/* ---- shared: body card + habit row ---- */
+function paintBody(node,compact){
+  const w=bodyWeek(),f=fill28(bodyDates()),k=bodyOn(),cb=comebacks(bodyDates());
+  const left=7-w.slots, daysLeft=6-daysBetween(weekStart(),today());
+  const qrow=(kind,label,n,max)=>`<div class="qrow"><div class="lb">${label}</div>
+    <div class="dots">${Array.from({length:max},(_,i)=>`<i class="${kind} ${i<n?'f':''}"></i>`).join('')}</div>
+    <div class="n">${kind==='rest'?(w.restEarned?'taken ✓':'not yet'):n+' / '+max}</div></div>`;
+  node.innerHTML=
+    (compact?'':`<div class="mhead"><div class="t">Body</div><div class="pc">${f.pct}%</div></div>
+       <div class="bar"><i style="width:${f.pct}%"></i></div>
+       <div class="msub"><span>${f.done} of the last 28 days</span>${cb?`<span class="rt">${cb} return${cb>1?'s':''} 💪</span>`:''}</div>
+       <div style="height:15px"></div>`)
+    +qrow('lift','Lift',w.lift,WEEK_QUOTA.lift)
+    +qrow('run','Run',w.run,WEEK_QUOTA.run)
+    +qrow('rest','Rest',w.restEarned?1:0,1)
+    +`<div class="body3">${BODY_KINDS.map(([v,e,l])=>
+        `<button class="${v} ${k===v?'on':''}" data-k="${v}"><span class="e">${e}</span>${l}</button>`).join('')}</div>
+      <div class="bnote">${
+        k ? (k==='rest' ? 'Rest logged. That counts as a slot, not a gap.'
+                        : left<=0 ? 'Full week. Anything past this is a bonus.'
+                                  : `Logged. ${left} slot${left>1?'s':''} left, ${Math.max(0,daysLeft)} day${daysLeft===1?'':'s'} to fill them.`)
+          : bodyNeeds()==='rest' ? 'Both quotas met — today is rest, and rest is a win.'
+                                 : 'Nothing logged today. Tap what you did.'}</div>`;
+  node.querySelectorAll('.body3 button').forEach(b=>b.onclick=()=>logBody(b.dataset.k));
+}
+
+function habitRow(h,editable){
+  const on=habitDone(h.id),f=fill28(logsFor(h.id));
+  const n=el(`<div class="hb ${on?'on':''}">
+    <button class="ck">✓</button>
+    <div class="mid"><div class="nm">${esc(h.emoji||'')} ${esc(h.name)}</div>
+      <div class="wk">${weekMarks(h.id).map(x=>`<i class="${x?'f':''}"></i>`).join('')}</div></div>
+    <div class="pc28">${f.pct}%</div>
+    ${editable?'<button class="ck edit" data-edit="1">⋯</button>':''}
+  </div>`);
+  n.querySelector('.ck').onclick=()=>toggleHabit(h.id);
+  if(editable)n.querySelector('[data-edit]').onclick=e=>{e.stopPropagation();sheetHabit(h);};
+  return n;
+}
+
 function renderGrind(){
   const hb=HABITS.filter(h=>h.active);
-  const w=WEIGHTS[0],prev=WEIGHTS[1];
+  const ruH=hb.find(h=>/russian/i.test(h.name));
+  const rest=hb.filter(h=>h!==ruH);
+  const wt=WEIGHTS[0],prev=WEIGHTS[1];
   const goalKg=Number(LIFE.weight_goal_kg||0);
-  const done7=d=>HLOGS.filter(l=>l.on_date>=daysAgo(6)).length;
+  const lvl=Math.min(RU_LADDER.length,Number(LIFE.ru_level||0));
+  const ruF=ruH?fill28(logsFor(ruH.id)):{done:0,pct:0};
+  const ruCb=ruH?comebacks(logsFor(ruH.id)):0;
+  const ruOn=ruH&&habitDone(ruH.id);
+
   $('#v-grind').innerHTML=
-   `<div class="tile tap" id="g-weight">
+   `<div class="sect"><h2>Body</h2><span class="cnt">${bodyWeek().slots}/7 slots</span></div>
+    <div class="tile" id="g-body"></div>
+
+    <div class="sect"><h2>Russian</h2><span class="cnt">${lvl>=RU_LADDER.length?'ТРКИ-1 ✓':RU_LADDER[lvl][0]}</span></div>
+    ${ruH?`<div class="tile">
+      <div class="mhead"><div class="t">Daily practice</div><div class="pc">${ruF.pct}%</div></div>
+      <div class="bar"><i style="width:${ruF.pct}%"></i></div>
+      <div class="msub"><span>${ruF.done} of the last 28 days</span>${ruCb?`<span class="rt">${ruCb} return${ruCb>1?'s':''} 💪</span>`:''}</div>
+      <button class="btn ${ruOn?'ghost':'green'}" id="g-ru" style="margin-top:14px">${ruOn?'Done today ✓':'Log today'}</button>
+      <div class="bnote">Duolingo, PODGOTOVKA, ten minutes of anything. The tap is the unit, not the hour.</div>
+      <div class="lad" id="g-lad">${RU_LADDER.map(([t,d],i)=>
+        `<div class="st ${i<lvl?'dn':i===lvl?'cur':''}" data-i="${i}">
+           <div class="dot">${i<lvl?'✓':i+1}</div>
+           <div><div class="t">${esc(t)}</div><div class="d">${esc(d)}</div></div>
+         </div>`).join('')}</div>
+    </div>`:'<div class="empty" style="padding:26px">No Russian habit yet — tap ＋ to add one.</div>'}
+
+    ${rest.length?`<div class="sect"><h2>Daily</h2><span class="cnt">${rest.filter(h=>habitDone(h.id)).length}/${rest.length}</span></div>
+    <div class="list" id="g-hb"></div>`:''}
+
+    <div class="sect"><h2>Progress</h2><span class="cnt">optional</span></div>
+    <div class="tile tap" id="g-weight">
       <div style="display:flex;align-items:baseline">
         <div style="font-size:15.5px;font-weight:800">Weight</div>
-        <div style="margin-left:auto;font-size:26px;font-weight:800;letter-spacing:-.8px">${w?w.kg+' kg':'—'}</div>
+        <div style="margin-left:auto;font-size:26px;font-weight:800;letter-spacing:-.8px">${wt?wt.kg+' kg':'—'}</div>
       </div>
       <div style="color:var(--mut);font-size:12.5px;font-weight:700;margin-top:3px;display:flex">
-        <span>${w?'logged '+relDay(w.on_date):'tap to log your first weigh-in'}</span>
-        ${w&&prev?`<span style="margin-left:auto;color:${w.kg<prev.kg?'var(--green-d)':'var(--mut)'}">${w.kg<prev.kg?'▼':'▲'} ${Math.abs(w.kg-prev.kg).toFixed(1)} kg</span>`:''}
+        <span>${wt?'logged '+agoDay(wt.on_date):'tap whenever you feel like it'}</span>
+        ${wt&&prev?`<span style="margin-left:auto;color:${wt.kg<prev.kg?'var(--green-d)':'var(--mut)'}">${wt.kg<prev.kg?'▼':'▲'} ${Math.abs(wt.kg-prev.kg).toFixed(1)} kg</span>`:''}
       </div>
-      ${goalKg&&w?`<div class="bar g"><i style="width:${Math.min(100,Math.max(0,Math.round((1-(w.kg-goalKg)/Math.max(1,(WEIGHTS[WEIGHTS.length-1]?.kg||w.kg)-goalKg))*100)))}%"></i></div>
-      <div style="color:var(--mut);font-size:12px;font-weight:700;margin-top:6px">goal ${goalKg} kg · ${(w.kg-goalKg).toFixed(1)} kg to go</div>`:''}
+      ${goalKg&&wt?`<div class="bar g"><i style="width:${Math.min(100,Math.max(0,Math.round((1-(wt.kg-goalKg)/Math.max(1,(WEIGHTS[WEIGHTS.length-1]?.kg||wt.kg)-goalKg))*100)))}%"></i></div>
+      <div style="color:var(--mut);font-size:12px;font-weight:700;margin-top:6px">goal ${goalKg} kg · ${(wt.kg-goalKg).toFixed(1)} kg to go</div>`:''}
     </div>
+    <div class="pstrip" id="g-photos" style="margin-top:11px"></div>`;
 
-    <div class="sect"><h2>Habits</h2><span class="cnt">${hb.filter(h=>habitDone(h.id)).length}/${hb.length} today</span></div>
-    <div class="list" id="g-hb">${hb.length?'':'<div class="empty" style="padding:30px">No habits yet.<br>Tap ＋ to add the first one.</div>'}</div>
-
-    <div class="sect"><h2>Last 7 days</h2><span class="cnt">${done7()} check-ins</span></div>
-    <div class="tile"><div style="display:flex;gap:5px">
-      ${Array.from({length:7},(_,i)=>{const d=addDays(today(),-(6-i));
-        const c=HLOGS.filter(l=>l.on_date===d).length,tt=hb.length||1;
-        const pc=Math.min(1,c/tt);
-        return `<div style="flex:1;text-align:center">
-          <div style="height:52px;display:flex;align-items:flex-end"><div style="width:100%;border-radius:7px;background:${pc?'linear-gradient(180deg,#9b6dff,#6d5efc)':'var(--card2)'};height:${Math.max(8,pc*52)}px"></div></div>
-          <div style="font-size:10px;font-weight:800;color:var(--mut);margin-top:5px">${new Date(d+'T00:00:00').toLocaleDateString(undefined,{weekday:'narrow'})}</div>
-        </div>`;}).join('')}
-    </div></div>`;
-
+  paintBody($('#g-body'),false);
+  if(ruH){
+    $('#g-ru').onclick=()=>toggleHabit(ruH.id);
+    $('#g-lad').querySelectorAll('.st').forEach(s=>s.onclick=()=>setRuLevel(Number(s.dataset.i),lvl));
+  }
+  if($('#g-hb'))rest.forEach(h=>$('#g-hb').appendChild(habitRow(h,true)));
   $('#g-weight').onclick=()=>sheetWeight();
-  const box=$('#g-hb');
-  hb.forEach(h=>{
-    const on=habitDone(h.id),st=habitStreak(h.id);
-    const n=el(`<div class="hb ${on?'on':''}">
-      <button class="ck">✓</button>
-      <div class="mid"><div class="nm">${esc(h.emoji||'')} ${esc(h.name)}</div>
-        <div class="wk">${weekMarks(h.id).map(f=>`<i class="${f?'f':''}"></i>`).join('')}</div></div>
-      ${st>0?`<div class="strk">🔥 ${st}</div>`:''}
-      <button class="ck" style="border:none;background:none;color:var(--mut);width:26px" data-edit="1">⋯</button>
-    </div>`);
-    n.querySelector('.ck').onclick=()=>toggleHabit(h.id);
-    n.querySelector('[data-edit]').onclick=e=>{e.stopPropagation();sheetHabit(h);};
-    box.appendChild(n);
-  });
+  paintPhotos();
+}
+
+// lvl = milestones completed. Tapping the one you're on completes it; tapping
+// a completed one drops back to it.
+async function setRuLevel(i,lvl){
+  const next=(i===lvl)?i+1:i;
+  if(next===lvl)return;
+  const data={...LIFE,ru_level:next};
+  const {error}=await sb.from('hq_life').upsert({id:'main',data,updated_at:new Date().toISOString()},{onConflict:'id'});
+  if(error){toast('Could not save');return;}
+  LIFE=data;
+  if(next>lvl){confetti();toast(next>=RU_LADDER.length?'ТРКИ-1 🇷🇺 that was the whole target':RU_LADDER[next-1][0]+' cleared ✓');}
+  render();
+}
+
+/* ---- progress photos (private bucket, signed URLs only) ---- */
+async function signPhotos(){
+  const need=PHOTOS.filter(p=>!PHOTO_URLS[p.path]).map(p=>p.path);
+  if(!need.length)return;
+  const {data}=await sb.storage.from('hq-photos').createSignedUrls(need,3600);
+  (data||[]).forEach(r=>{if(r.signedUrl)PHOTO_URLS[r.path]=r.signedUrl;});
+}
+function paintPhotos(){
+  const box=$('#g-photos');if(!box)return;
+  box.innerHTML=`<button class="add" id="g-addph">＋</button>`+
+    PHOTOS.map(p=>`<div class="ph" data-p="${esc(p.path)}">
+      <img src="${PHOTO_URLS[p.path]||''}" alt="">
+      <div class="dt">${fmtDate(p.on_date)}</div></div>`).join('');
+  $('#g-addph').onclick=addPhoto;
+  box.querySelectorAll('.ph').forEach(n=>n.onclick=()=>delPhoto(n.dataset.p));
+  if(PHOTOS.some(p=>!PHOTO_URLS[p.path]))signPhotos().then(()=>{if($('#g-photos'))paintPhotos();});
+}
+function addPhoto(){
+  const inp=el('<input type="file" accept="image/*" class="hidden">');
+  document.body.appendChild(inp);
+  inp.onchange=async()=>{
+    const file=inp.files&&inp.files[0];inp.remove();
+    if(!file)return;
+    toast('Uploading…');
+    const ext=((file.name||'').split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+    const path=`${today()}-${Date.now()}.${ext}`;
+    const up=await sb.storage.from('hq-photos').upload(path,file,{contentType:file.type||'image/jpeg'});
+    if(up.error){toast('Upload failed');return;}
+    const {error}=await sb.from('hq_photos').insert({on_date:today(),path});
+    if(error){toast('File saved, record failed');return;}
+    toast('Photo saved ✓');load();
+  };
+  inp.click();
+}
+async function delPhoto(path){
+  if(!confirm('Delete this photo?'))return;
+  await sb.storage.from('hq-photos').remove([path]);
+  const {error}=await sb.from('hq_photos').delete().eq('path',path);
+  if(error){toast('Delete failed');return;}
+  delete PHOTO_URLS[path];toast('Removed');load();
 }
 
 /* ---- sheets ---- */
@@ -1170,13 +1494,38 @@ function sheetStage(){
     fields:fld('Current stage',`<select id="k-st">${VISA_STEPS.map(s=>`<option value="${s.n}" ${s.n===cur?'selected':''}>${s.n} — ${s.l}</option>`).join('')}</select>`)
       +fld('Registration no.',`<input id="k-reg" value="${esc(LIFE.reg_no||'')}">`)
       +fld('Prep university',`<input id="k-prep" value="${esc(LIFE.prep_uni||'')}">`)
-      +fld('Degree university',`<input id="k-deg" value="${esc(LIFE.degree_uni||'')}">`),
+      +fld('Degree university',`<input id="k-deg" value="${esc(LIFE.degree_uni||'')}">`)
+      // The two switches that flip the whole app on arrival.
+      +`<div class="row2">${fld('Landed in Moscow',`<select id="k-arr"><option value="0" ${LIFE.arrived?'':'selected'}>Not yet</option><option value="1" ${LIFE.arrived?'selected':''}>Yes — I'm there</option></select>`)}
+        ${fld('Weebji Studio',`<select id="k-park"><option value="1" ${studioParked()?'selected':''}>Parked</option><option value="0" ${studioParked()?'':'selected'}>Running</option></select>`)}</div>`,
     save:async()=>{
       const data={...LIFE,visa_stage:Number($('#k-st').value),reg_no:$('#k-reg').value.trim(),
-        prep_uni:$('#k-prep').value.trim(),degree_uni:$('#k-deg').value.trim()};
+        prep_uni:$('#k-prep').value.trim(),degree_uni:$('#k-deg').value.trim(),
+        arrived:$('#k-arr').value==='1',studio_parked:$('#k-park').value==='1'};
       const {error}=await sb.from('hq_life').upsert({id:'main',data,updated_at:new Date().toISOString()},{onConflict:'id'});
       if(error)throw error; LIFE=data;
     }});
+}
+
+function sheetReady(x,phase){
+  const isNew=!x;x=x||{status:'todo',blocked:false,phase:phase||'pre'};
+  openForm({title:isNew?'New item':'Readiness item',emoji:x.blocked?'⏸':'🧳',color:'#12b6c9',
+    fields:fld('What',`<input id="k-t" value="${esc(x.title||'')}" placeholder="e.g. Thermal base layers">`)
+      +`<div class="row2">${fld('Status',`<select id="k-s">${DOC_STATUS.map(([v,l])=>`<option value="${v}" ${v===x.status?'selected':''}>${l}</option>`).join('')}</select>`)}
+        ${fld('Phase',`<select id="k-p">${[['pre','Before you fly'],['arrival','After you land']].map(([v,l])=>`<option value="${v}" ${v===x.phase?'selected':''}>${l}</option>`).join('')}</select>`)}</div>`
+      // Blocked items are excluded from the readiness % — they measure someone
+      // else's paperwork, and this number only ever counts what he controls.
+      +fld('Waiting on someone else',`<select id="k-b"><option value="0" ${x.blocked?'':'selected'}>No — this one's mine</option><option value="1" ${x.blocked?'selected':''}>Yes — blocked, don't count it</option></select>`)
+      +fld('Notes',`<textarea id="k-note">${esc(x.note||'')}</textarea>`),
+    save:async()=>{
+      const rec={title:$('#k-t').value.trim(),status:$('#k-s').value,phase:$('#k-p').value,
+        blocked:$('#k-b').value==='1',note:$('#k-note').value.trim()||null};
+      if(!rec.title){toast('Give it a title');return false;}
+      const {error}=isNew?await sb.from('hq_ready').insert(rec):await sb.from('hq_ready').update(rec).eq('id',x.id);
+      if(error)throw error;
+      if(!isNew&&rec.status==='done'&&x.status!=='done'&&!rec.blocked)confetti();
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_ready').delete().eq('id',x.id);if(error)throw error;}});
 }
 
 function sheetDoc(d){
