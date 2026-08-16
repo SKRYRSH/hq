@@ -244,6 +244,8 @@
   .bar > i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#6d5efc,#9b6dff);
     transition:width .5s cubic-bezier(.2,1,.4,1)}
   .bar.g > i{background:linear-gradient(90deg,#1fb571,#6ee7a8)}
+  /* baseline still filling — muted so it doesn't read as a low score */
+  .bar.mut > i{background:linear-gradient(90deg,#d5cdf5,#bfb4ee)}
 
   /* visa stepper */
   .steps{display:flex;align-items:center;gap:0;margin:14px 2px 4px}
@@ -996,6 +998,24 @@ function fill28(dates){
   return {done:n,pct:Math.round(n/28*100)};
 }
 
+// A 28-day window only means something once there are 28 days behind it. On a
+// freshly started track a low % measures the age of the record, not the effort
+// — so until there's enough history, show the window filling instead.
+const BASELINE_DAYS=14;
+function windowAge(dates){
+  if(!dates.length)return 0;
+  const oldest=dates.reduce((a,b)=>a<b?a:b);
+  return Math.min(28,Math.max(1,daysBetween(oldest,today())+1));
+}
+function metric(dates){
+  const f=fill28(dates),age=windowAge(dates),young=age<BASELINE_DAYS;
+  return {done:f.done,pct:f.pct,age,young,
+    big:   young?String(f.done):f.pct+'%',
+    small: young?f.done+'d':f.pct+'%',
+    sub:   young?(age?`building baseline · day ${age} of 28`:'nothing logged yet'):`${f.done} of the last 28 days`,
+    barPct:young?Math.round(age/28*100):f.pct};
+}
+
 // How many times he came back after going quiet. Counting returns makes a
 // restart the tracked win instead of the thing that proves he failed.
 function comebacks(dates){
@@ -1149,7 +1169,7 @@ function render(){
           +(studioParked()?0:CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage)).length);
   const w=bodyWeek();
   $('#sub-greet').textContent = od?`${od} thing${od>1?'s':''} overdue ⏰`
-    : `${w.slots}/7 slots this week · ${fill28(bodyDates()).pct}%`;
+    : (m=>m.young?`${w.slots}/7 slots this week`:`${w.slots}/7 slots this week · ${m.pct}%`)(metric(bodyDates()));
   renderStudio();
   if(VIEW==='today')renderToday();
   else if(VIEW==='russia')renderRussia();
@@ -1337,15 +1357,15 @@ function renderMoney(){
 
 /* ---- shared: body card + habit row ---- */
 function paintBody(node,compact){
-  const w=bodyWeek(),f=fill28(bodyDates()),k=bodyOn(),cb=comebacks(bodyDates());
+  const w=bodyWeek(),f=metric(bodyDates()),k=bodyOn(),cb=comebacks(bodyDates());
   const left=7-w.slots, daysLeft=6-daysBetween(weekStart(),today());
   const qrow=(kind,label,n,max)=>`<div class="qrow"><div class="lb">${label}</div>
     <div class="dots">${Array.from({length:max},(_,i)=>`<i class="${kind} ${i<n?'f':''}"></i>`).join('')}</div>
     <div class="n">${kind==='rest'?(w.restEarned?'taken ✓':'not yet'):n+' / '+max}</div></div>`;
   node.innerHTML=
-    (compact?'':`<div class="mhead"><div class="t">Body</div><div class="pc">${f.pct}%</div></div>
-       <div class="bar"><i style="width:${f.pct}%"></i></div>
-       <div class="msub"><span>${f.done} of the last 28 days</span>${cb?`<span class="rt">${cb} return${cb>1?'s':''} 💪</span>`:''}</div>
+    (compact?'':`<div class="mhead"><div class="t">Body</div><div class="pc">${f.big}</div></div>
+       <div class="bar ${f.young?'mut':''}"><i style="width:${f.barPct}%"></i></div>
+       <div class="msub"><span>${f.sub}</span>${cb?`<span class="rt">${cb} return${cb>1?'s':''} 💪</span>`:''}</div>
        <div style="height:15px"></div>`)
     +qrow('lift','Lift',w.lift,WEEK_QUOTA.lift)
     +qrow('run','Run',w.run,WEEK_QUOTA.run)
@@ -1362,12 +1382,12 @@ function paintBody(node,compact){
 }
 
 function habitRow(h,editable){
-  const on=habitDone(h.id),f=fill28(logsFor(h.id));
+  const on=habitDone(h.id),f=metric(logsFor(h.id));
   const n=el(`<div class="hb ${on?'on':''}">
     <button class="ck">✓</button>
     <div class="mid"><div class="nm">${esc(h.emoji||'')} ${esc(h.name)}</div>
       <div class="wk">${weekMarks(h.id).map(x=>`<i class="${x?'f':''}"></i>`).join('')}</div></div>
-    <div class="pc28">${f.pct}%</div>
+    <div class="pc28">${f.small}</div>
     ${editable?'<button class="ck edit" data-edit="1">⋯</button>':''}
   </div>`);
   n.querySelector('.ck').onclick=()=>toggleHabit(h.id);
@@ -1382,7 +1402,7 @@ function renderGrind(){
   const wt=WEIGHTS[0],prev=WEIGHTS[1];
   const goalKg=Number(LIFE.weight_goal_kg||0);
   const lvl=Math.min(RU_LADDER.length,Number(LIFE.ru_level||0));
-  const ruF=ruH?fill28(logsFor(ruH.id)):{done:0,pct:0};
+  const ruF=ruH?metric(logsFor(ruH.id)):{done:0,pct:0,big:'0',sub:'nothing logged yet',barPct:0,young:true};
   const ruCb=ruH?comebacks(logsFor(ruH.id)):0;
   const ruOn=ruH&&habitDone(ruH.id);
 
@@ -1392,9 +1412,9 @@ function renderGrind(){
 
     <div class="sect"><h2>Russian</h2><span class="cnt">${lvl>=RU_LADDER.length?'ТРКИ-1 ✓':RU_LADDER[lvl][0]}</span></div>
     ${ruH?`<div class="tile">
-      <div class="mhead"><div class="t">Daily practice</div><div class="pc">${ruF.pct}%</div></div>
-      <div class="bar"><i style="width:${ruF.pct}%"></i></div>
-      <div class="msub"><span>${ruF.done} of the last 28 days</span>${ruCb?`<span class="rt">${ruCb} return${ruCb>1?'s':''} 💪</span>`:''}</div>
+      <div class="mhead"><div class="t">Daily practice</div><div class="pc">${ruF.big}</div></div>
+      <div class="bar ${ruF.young?'mut':''}"><i style="width:${ruF.barPct}%"></i></div>
+      <div class="msub"><span>${ruF.sub}</span>${ruCb?`<span class="rt">${ruCb} return${ruCb>1?'s':''} 💪</span>`:''}</div>
       <button class="btn ${ruOn?'ghost':'green'}" id="g-ru" style="margin-top:14px">${ruOn?'Done today ✓':'Log today'}</button>
       <div class="bnote">Duolingo, PODGOTOVKA, ten minutes of anything. The tap is the unit, not the hour.</div>
       <div class="lad" id="g-lad">${RU_LADDER.map(([t,d],i)=>
