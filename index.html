@@ -308,8 +308,21 @@
   .qrow .dots i.rest.f{background:var(--teal)}
   .qrow .n{font-size:12.5px;font-weight:800;color:var(--mut);flex-shrink:0}
 
-  /* today's three taps */
+  /* the 8-slot rotation strip */
+  .cyc{display:flex;align-items:center;justify-content:center;gap:2px;padding:4px 0 2px}
+  .cyc .cs{width:29px;height:29px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-size:15px;background:var(--card2);opacity:.5;transition:all .18s cubic-bezier(.2,1.3,.4,1)}
+  .cyc .cs.r{font-size:13px}
+  .cyc .cs.at{opacity:1;background:var(--primary);box-shadow:0 0 0 3px #efecff;transform:scale(1.12)}
+  .cyc .cd{width:5px;height:2px;border-radius:2px;background:var(--line);flex-shrink:0}
+  .cynote{text-align:center;font-size:12.5px;font-weight:800;color:var(--mut);margin-top:7px}
+
+  /* today's taps */
   .body3{display:flex;gap:9px;margin-top:15px}
+  .body3.five{gap:6px}
+  .body3.five button{padding:11px 2px;font-size:11.5px;border-radius:13px}
+  .body3.five button .e{font-size:18px}
+  .body3 button.due{box-shadow:0 3px 0 #e2ddd2, 0 0 0 2px var(--primary)}
   .body3 button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;
     border-radius:15px;background:var(--card2);font-weight:800;font-size:12.5px;color:var(--ink2);
     box-shadow:0 3px 0 #e2ddd2;transition:all .14s cubic-bezier(.2,1.3,.4,1)}
@@ -317,6 +330,31 @@
   .body3 button:active{transform:translateY(3px);box-shadow:0 0 0 #e2ddd2}
   .body3 button.on{background:var(--green);color:#fff;box-shadow:0 3px 0 var(--green-d)}
   .body3 button.rest.on{background:var(--teal);box-shadow:0 3px 0 #0d90a1}
+
+  /* channel: current video + script workflow */
+  .ytnow{margin-top:13px;padding:13px 14px;border-radius:15px;background:var(--card2)}
+  .ytst{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--primary)}
+  .ytt{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-top:3px;line-height:1.25}
+  .yts{font-size:12.5px;font-weight:700;color:var(--mut);margin-top:2px}
+  .ytnow .bar{margin-top:10px}
+  .ytc{font-size:12px;font-weight:800;color:var(--mut);margin-top:6px}
+  .flow{margin-top:14px;border-top:1px solid var(--line)}
+  .flow .fs{display:flex;gap:11px;padding:11px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+  .flow .fs:last-child{border-bottom:0}
+  .flow .fck{width:25px;height:25px;flex-shrink:0;border-radius:9px;background:var(--card2);color:var(--mut);
+    font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .16s}
+  .flow .fs.dn .fck{background:var(--green);color:#fff}
+  .flow .fs.dn .ft{color:var(--mut);text-decoration:line-through}
+  .flow .ft{font-size:13.5px;font-weight:800;line-height:1.3}
+  .flow .fd{font-size:12px;font-weight:600;color:var(--mut);margin-top:2px;line-height:1.4}
+  .ytlist{margin-top:14px;border-top:1px solid var(--line)}
+  .ytrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+  .ytrow:last-child{border-bottom:0}
+  .ytrow.cur{background:#f6f4ff;border-radius:11px;padding-left:8px;padding-right:8px}
+  .ytrow .e{font-size:17px;flex-shrink:0}
+  .ytrow .nm{font-size:13.5px;font-weight:800;line-height:1.25}
+  .ytrow .sb{font-size:11.5px;font-weight:700;color:var(--mut);margin-top:1px}
+  .ytrow .mid{flex:1;min-width:0}
 
   /* language ladder */
   .lad{margin-top:16px;border-top:1px solid var(--line)}
@@ -452,8 +490,14 @@ const CATS_IN=['Client payment','Play Store','Family','Other income'];
 const CATS_OUT=['Translations','Medicals','Visa & travel','Food','Subscriptions','Other'];
 
 /* ---- the arc: body rotation + language ladder ---- */
-const BODY_KINDS=[['lift','🏋️','Lift'],['run','🏃','Run'],['rest','😌','Rest']];
-const WEEK_QUOTA={lift:3,run:3,rest:1};
+// The rotation: push · rest · pull · rest · legs · rest · run · rest, repeating.
+// It is a POSITION, not a weekly quota — miss a week and the cycle simply waits
+// where you left it. There is nothing to catch up on and nothing to break.
+const BODY_KINDS=[['push','💪','Push'],['pull','🪝','Pull'],['legs','🦵','Legs'],['run','🏃','Run'],['rest','😌','Rest']];
+const TRAIN_CYCLE=['push','pull','legs','run'];
+// Legacy rows from the old 3-lift/3-run split still carry kind 'lift'; they count
+// as training for the rotation and fall back to the top of the cycle.
+const isTrain=k=>!!k&&k!=='rest';
 // A lapse is 4+ consecutive missed days. Two quiet days is a normal week;
 // four is the start of the collapse this whole module exists to interrupt.
 const LAPSE_DAYS=4;
@@ -466,7 +510,26 @@ const RU_LADDER=[
 ];
 
 let LEDGER=[], GOALS=[], DOCS=[], DEADLINES=[], HABITS=[], HLOGS=[], WEIGHTS=[], LIFE={};
-let BODY=[], READY=[], PHOTOS=[], PHOTO_URLS={};
+let BODY=[], READY=[], PHOTOS=[], PHOTO_URLS={}, VIDEOS=[];
+
+/* ---- the channel: WEEBJI KI BAKWAAS ----
+   One take per video, argued properly. The pipeline is a position, not a
+   deadline — a video can sit in a stage for a month without that being a
+   failure. Same rule as the body rotation. */
+const VID_STAGES=[['idea','💡','Idea'],['research','🔎','Research'],['script','✍️','Script'],
+                  ['shot','🎬','Shot'],['edit','✂️','Edit'],['posted','🚀','Posted']];
+// The workflow he asked for: what he actually does, in order. AI does the
+// homework; the words stay his, because the voice IS the product.
+const SCRIPT_FLOW=[
+  ['take','Say the take in one line','Hindi, the way you\'d say it to a friend. If it needs a paragraph, it isn\'t a take yet.'],
+  ['recpt','Get the receipts','Ask an AI for the arcs, feats and moments that back you up. This is homework, not writing.'],
+  ['steel','Write the case AGAINST you','Ask for the strongest counter-argument. Write the best one down. If you can\'t answer it, drop the take — that\'s a win too.'],
+  ['talk','Talk it out for 5 minutes','Record yourself arguing it. No script. This is the only step that produces your actual voice.'],
+  ['struct','Cut the ramble into 3 points','Best argument last. Everything that isn\'t one of the three goes.'],
+  ['cold','Write the first 15 seconds word-for-word','Only the cold open is scripted. The rest stays loose or it sounds read.'],
+  ['shoot','Shoot it — take first, sting after','Face on camera. No "hey guys". The take is the first thing out of your mouth.'],
+  ['shorts','Pull 4–5 Hindi search questions','Same character, question-shaped titles. They rank in search and point back here.']
+];
 let VIEW=localStorage.getItem('hq_view')||'today';
 let LEDGER_FILTER='all';
 
@@ -510,7 +573,7 @@ sb.auth.onAuthStateChange((_e,s)=>{if(s&&$('#app').classList.contains('hidden'))
 
 /* ---------- data ---------- */
 async function load(){
-  const [clientsRes, stRes, ledRes, goalRes, docRes, dlRes, hbRes, hlRes, wtRes, lifeRes, bdRes, rdRes, phRes] = await Promise.all([
+  const [clientsRes, stRes, ledRes, goalRes, docRes, dlRes, hbRes, hlRes, wtRes, lifeRes, bdRes, rdRes, phRes, vidRes] = await Promise.all([
     sb.from('hq_clients').select('*').order('created_at',{ascending:false}),
     sb.from('hq_settings').select('*').eq('id','main').maybeSingle(),
     sb.from('hq_ledger').select('*').order('occurred_on',{ascending:false}).limit(400),
@@ -523,13 +586,14 @@ async function load(){
     sb.from('hq_life').select('*').eq('id','main').maybeSingle(),
     sb.from('hq_body_log').select('*').gte('on_date',daysAgo(200)).order('on_date',{ascending:false}),
     sb.from('hq_ready').select('*').order('sort'),
-    sb.from('hq_photos').select('*').order('on_date',{ascending:false}).limit(60)
+    sb.from('hq_photos').select('*').order('on_date',{ascending:false}).limit(60),
+    sb.from('hq_videos').select('*').order('sort')
   ]);
   if(clientsRes.error){toast('Couldn\'t load');return;}
   CLIENTS=clientsRes.data||[]; SETTINGS=stRes.data||SETTINGS||{};
   LEDGER=ledRes.data||[]; GOALS=goalRes.data||[]; DOCS=docRes.data||[]; DEADLINES=dlRes.data||[];
   HABITS=hbRes.data||[]; HLOGS=hlRes.data||[]; WEIGHTS=wtRes.data||[]; LIFE=(lifeRes.data&&lifeRes.data.data)||{};
-  BODY=bdRes.data||[]; READY=rdRes.data||[]; PHOTOS=phRes.data||[];
+  BODY=bdRes.data||[]; READY=rdRes.data||[]; PHOTOS=phRes.data||[]; VIDEOS=vidRes.data||[];
   render();
 }
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
@@ -1037,26 +1101,35 @@ function weekStart(){
   return addDays(today(),-((d.getDay()+6)%7));
 }
 
-/* ---- body: 3 lift · 3 run · 1 rest, any order ---- */
+/* ---- body: push · rest · pull · rest · legs · rest · run · rest ---- */
 const bodyDates=()=>BODY.map(b=>b.on_date);
 function bodyOn(d){const r=BODY.find(b=>b.on_date===(d||today()));return r?r.kind:null;}
-function bodyWeek(){
-  const ws=weekStart();
-  const c={lift:0,run:0,rest:0};
-  BODY.filter(b=>b.on_date>=ws&&b.on_date<=addDays(ws,6)).forEach(b=>{c[b.kind]=(c[b.kind]||0)+1;});
-  // Rest is the seventh slot, not a gap. Once both training quotas are met it
-  // is earned whether or not he remembered to tap it.
-  const earned=c.lift>=WEEK_QUOTA.lift&&c.run>=WEEK_QUOTA.run;
-  const rest=earned||c.rest>0;
-  return {...c,restEarned:rest,
-    slots:Math.min(WEEK_QUOTA.lift,c.lift)+Math.min(WEEK_QUOTA.run,c.run)+(rest?1:0)};
-}
-// What the week still wants. Never phrased as a debt.
+// The most recent training day, ignoring rests. BODY is date-descending.
+function lastTrain(){return BODY.find(b=>isTrain(b.kind))||null;}
+// What the rotation points at next. Deliberately blind to how many days have
+// passed — a four-day gap and a four-month gap both just resume the cycle.
 function bodyNeeds(){
-  const w=bodyWeek();
-  if(w.lift<WEEK_QUOTA.lift) return 'lift';
-  if(w.run<WEEK_QUOTA.run) return 'run';
-  return 'rest';
+  const newest=BODY[0];
+  if(!newest)return TRAIN_CYCLE[0];
+  if(isTrain(newest.kind))return 'rest';        // trained last → rest is next
+  const lt=lastTrain();
+  if(!lt)return TRAIN_CYCLE[0];
+  const i=TRAIN_CYCLE.indexOf(lt.kind);          // -1 for legacy 'lift' → push
+  return TRAIN_CYCLE[(i+1)%TRAIN_CYCLE.length];
+}
+// The 8 slots of the current pass, and which one is live right now.
+function bodyCycle(){
+  const seq=[];TRAIN_CYCLE.forEach(k=>{seq.push(k);seq.push('rest');});
+  const need=bodyNeeds(),done=bodyOn();
+  // The live slot is today's log if there is one, otherwise what's next up.
+  const live=done||need;
+  let at=seq.indexOf(live);
+  if(live==='rest'){                             // pin rest to the one after the last training slot
+    const lt=lastTrain();
+    const i=lt?TRAIN_CYCLE.indexOf(lt.kind):-1;
+    at=(i>=0?i:0)*2+1;
+  }
+  return {seq,at,live,need,done};
 }
 async function logBody(kind){
   const d=today();
@@ -1067,7 +1140,8 @@ async function logBody(kind){
     const {error}=await sb.from('hq_body_log').upsert({on_date:d,kind},{onConflict:'on_date'});
     if(error){toast('Could not save');return;}
     BODY=BODY.filter(b=>b.on_date!==d);BODY.unshift({on_date:d,kind});
-    if(bodyWeek().slots>=7){confetti();toast('Full week — 3 lift, 3 run, rest taken 💪');}
+    // Run closes the rotation — the only moment worth a celebration.
+    if(kind==='run'){confetti();toast('Full rotation — push, pull, legs, run 💪');}
   }
   render();
 }
@@ -1120,11 +1194,11 @@ function directive(){
   }
 
   if(!bodyOn(t)){
-    const w=bodyWeek(),need=bodyNeeds();
-    const left=6-daysBetween(weekStart(),t);
-    if(need==='rest')return {k:'Body',h:'😌 Rest day',p:'Three lifts and three runs are in. Rest is the seventh slot, not a gap — tap it and go be a person.',go:'grind'};
-    return {k:'Body',h:(need==='lift'?'🏋️ Lift':'🏃 Run')+' day',
-      p:`${w.lift}/3 lifts, ${w.run}/3 runs this week. ${left>0?left+(left>1?' days':' day')+' left to fill it — no rush.':'Last day of the week; whatever lands, lands.'}`,go:'grind'};
+    const need=bodyNeeds();
+    if(need==='rest')return {k:'Body',h:'😌 Rest day',p:'The rotation says rest, and rest is a slot in it — not a gap. Tap it and go be a person.',go:'grind'};
+    const lbl=(BODY_KINDS.find(k=>k[0]===need)||[,'','']);
+    return {k:'Body',h:lbl[1]+' '+lbl[2]+' day',
+      p:'Next in the rotation. However long it has been, this is simply the one that comes next.',go:'grind'};
   }
 
   const ru=HABITS.find(h=>h.active&&/russian/i.test(h.name)&&!habitDone(h.id));
@@ -1167,9 +1241,9 @@ function render(){
   const t=today();
   const od=DEADLINES.filter(d=>!d.done&&d.due_on&&d.due_on<t).length
           +(studioParked()?0:CLIENTS.filter(c=>c.next_action_date&&c.next_action_date<t&&!['paid','lost'].includes(c.stage)).length);
-  const w=bodyWeek();
+  const nk=(BODY_KINDS.find(x=>x[0]===bodyNeeds())||[,'','—']);
   $('#sub-greet').textContent = od?`${od} thing${od>1?'s':''} overdue ⏰`
-    : (m=>m.young?`${w.slots}/7 slots this week`:`${w.slots}/7 slots this week · ${m.pct}%`)(metric(bodyDates()));
+    : (m=>{const nx=bodyOn()?'body logged today':'next up: '+nk[2].toLowerCase();return m.young?nx:nx+' · '+m.pct+'%';})(metric(bodyDates()));
   renderStudio();
   if(VIEW==='today')renderToday();
   else if(VIEW==='russia')renderRussia();
@@ -1190,7 +1264,7 @@ function renderToday(){
       <button class="go" data-go="${d.go}">Take me there →</button>
     </div>
 
-    <div class="sect"><h2>Today</h2><span class="cnt">${bodyWeek().slots}/7 slots</span></div>
+    <div class="sect"><h2>Today</h2><span class="cnt">${(BODY_KINDS.find(x=>x[0]===(bodyOn()||bodyNeeds()))||[,,"—"])[2]}</span></div>
     <div class="tile" id="t-body"></div>
     <div class="list" id="t-hb" style="margin-top:11px">${hb.length?'':'<div class="empty" style="padding:26px">No habits yet — add one from the Grind tab.</div>'}</div>
 
@@ -1357,28 +1431,103 @@ function renderMoney(){
 
 /* ---- shared: body card + habit row ---- */
 function paintBody(node,compact){
-  const w=bodyWeek(),f=metric(bodyDates()),k=bodyOn(),cb=comebacks(bodyDates());
-  const left=7-w.slots, daysLeft=6-daysBetween(weekStart(),today());
-  const qrow=(kind,label,n,max)=>`<div class="qrow"><div class="lb">${label}</div>
-    <div class="dots">${Array.from({length:max},(_,i)=>`<i class="${kind} ${i<n?'f':''}"></i>`).join('')}</div>
-    <div class="n">${kind==='rest'?(w.restEarned?'taken ✓':'not yet'):n+' / '+max}</div></div>`;
+  const f=metric(bodyDates()),k=bodyOn(),cb=comebacks(bodyDates()),cy=bodyCycle();
+  const lbl=v=>(BODY_KINDS.find(x=>x[0]===v)||[,'','—']);
+  const nx=lbl(cy.need);
   node.innerHTML=
     (compact?'':`<div class="mhead"><div class="t">Body</div><div class="pc">${f.big}</div></div>
        <div class="bar ${f.young?'mut':''}"><i style="width:${f.barPct}%"></i></div>
        <div class="msub"><span>${f.sub}</span>${cb?`<span class="rt">${cb} return${cb>1?'s':''} 💪</span>`:''}</div>
        <div style="height:15px"></div>`)
-    +qrow('lift','Lift',w.lift,WEEK_QUOTA.lift)
-    +qrow('run','Run',w.run,WEEK_QUOTA.run)
-    +qrow('rest','Rest',w.restEarned?1:0,1)
-    +`<div class="body3">${BODY_KINDS.map(([v,e,l])=>
-        `<button class="${v} ${k===v?'on':''}" data-k="${v}"><span class="e">${e}</span>${l}</button>`).join('')}</div>
+    +`<div class="cyc">${cy.seq.map((v,i)=>
+        `<span class="cs ${v==='rest'?'r':'t'} ${i===cy.at?'at':''}">${lbl(v)[1]}</span>`
+      ).join('<span class="cd"></span>')}</div>
+      <div class="cynote">${k?'Today: '+lbl(k)[2]:'Next up: '+nx[2]}</div>`
+    +`<div class="body3 five">${BODY_KINDS.map(([v,e,l])=>
+        `<button class="${v} ${k===v?'on':''} ${!k&&v===cy.need?'due':''}" data-k="${v}"><span class="e">${e}</span>${l}</button>`).join('')}</div>
       <div class="bnote">${
-        k ? (k==='rest' ? 'Rest logged. That counts as a slot, not a gap.'
-                        : left<=0 ? 'Full week. Anything past this is a bonus.'
-                                  : `Logged. ${left} slot${left>1?'s':''} left, ${Math.max(0,daysLeft)} day${daysLeft===1?'':'s'} to fill them.`)
-          : bodyNeeds()==='rest' ? 'Both quotas met — today is rest, and rest is a win.'
-                                 : 'Nothing logged today. Tap what you did.'}</div>`;
+        k ? (k==='rest' ? 'Rest logged. That is a slot in the rotation, not a gap.'
+                        : 'Logged. Rest is what comes next — take it.')
+          : cy.need==='rest' ? 'The rotation says rest today. Tap it so it counts.'
+                             : 'Whenever you left off, this is simply the next one.'}</div>`;
   node.querySelectorAll('.body3 button').forEach(b=>b.onclick=()=>logBody(b.dataset.k));
+}
+
+/* ---- channel: the pipeline + the script workflow ---- */
+function vidStage(v){return VID_STAGES.find(s=>s[0]===v.stage)||VID_STAGES[0];}
+function vidSteps(v){return (v&&v.steps)||{};}
+function vidDone(v){return SCRIPT_FLOW.filter(([k])=>vidSteps(v)[k]).length;}
+// The video actually being worked on: furthest along without being posted.
+function vidActive(){
+  const order=VID_STAGES.map(s=>s[0]);
+  return VIDEOS.filter(v=>v.stage!=='posted')
+    .sort((a,b)=>order.indexOf(b.stage)-order.indexOf(a.stage)||(a.sort||0)-(b.sort||0))[0]||null;
+}
+async function toggleStep(id,key){
+  const v=VIDEOS.find(x=>x.id===id);if(!v)return;
+  const steps={...vidSteps(v)};steps[key]=!steps[key];
+  const {error}=await sb.from('hq_videos').update({steps,updated_at:new Date().toISOString()}).eq('id',id);
+  if(error){toast('Could not save');return;}
+  v.steps=steps;render();
+}
+function paintYT(node){
+  if(!node)return;
+  const act=vidActive();
+  const posted=VIDEOS.filter(v=>v.stage==='posted').length;
+  if(!VIDEOS.length){
+    node.innerHTML=`<div class="empty" style="padding:22px 14px">No takes yet.<br>
+      <span style="font-size:12.5px">Write down one you'd defend at 2am.</span></div>
+      <button class="btn ghost" id="yt-add">+ New take</button>`;
+    $('#yt-add').onclick=()=>sheetVideo(null);
+    return;
+  }
+  const st=act?vidStage(act):null;
+  node.innerHTML=
+   `<div class="mhead"><div class="t">WEEBJI KI BAKWAAS</div><div class="pc" style="font-size:18px">${posted}<span style="font-size:12px;color:var(--mut)"> posted</span></div></div>
+    ${act?`<div class="ytnow">
+        <div class="ytst">${st[1]} ${st[2]}</div>
+        <div class="ytt">${esc(act.title)}</div>
+        ${act.subject?`<div class="yts">${esc(act.subject)}</div>`:''}
+        <div class="bar"><i style="width:${Math.round(vidDone(act)/SCRIPT_FLOW.length*100)}%"></i></div>
+        <div class="ytc">${vidDone(act)} of ${SCRIPT_FLOW.length} steps</div>
+      </div>
+      <div class="flow" id="yt-flow">${SCRIPT_FLOW.map(([k,t,d],i)=>
+        `<div class="fs ${vidSteps(act)[k]?'dn':''}" data-k="${k}">
+           <button class="fck">${vidSteps(act)[k]?'✓':i+1}</button>
+           <div><div class="ft">${esc(t)}</div><div class="fd">${esc(d)}</div></div>
+         </div>`).join('')}</div>`
+      :'<div class="bnote" style="margin-top:12px">Everything is posted. Add the next take when one annoys you enough.</div>'}
+    <div class="ytlist" id="yt-list">${VIDEOS.map(v=>{
+        const s=vidStage(v);
+        return `<div class="ytrow ${act&&v.id===act.id?'cur':''}" data-id="${esc(v.id)}">
+          <span class="e">${s[1]}</span>
+          <div class="mid"><div class="nm">${esc(v.title)}</div><div class="sb">${s[2]}${v.subject?' · '+esc(v.subject):''}</div></div>
+          <div class="pc28">${vidDone(v)}/${SCRIPT_FLOW.length}</div></div>`;
+      }).join('')}</div>
+    <button class="btn ghost" id="yt-add" style="margin-top:12px">+ New take</button>`;
+  if(act&&$('#yt-flow'))$('#yt-flow').querySelectorAll('.fs').forEach(f=>f.onclick=()=>toggleStep(act.id,f.dataset.k));
+  node.querySelectorAll('.ytrow').forEach(r=>r.onclick=()=>sheetVideo(VIDEOS.find(v=>v.id===r.dataset.id)));
+  $('#yt-add').onclick=()=>sheetVideo(null);
+}
+
+function sheetVideo(v){
+  const isNew=!v;v=v||{stage:'idea',sort:(VIDEOS.length?Math.max(...VIDEOS.map(x=>x.sort||0)):0)+1};
+  openForm({title:isNew?'New take':'Video',emoji:'🎬',color:'#6d5efc',
+    fields:fld('The take (one line)',`<input id="k-t" value="${esc(v.title||'')}" placeholder="e.g. Sakura trash nahi hai">`)
+      +fld('Character / anime',`<input id="k-sub" value="${esc(v.subject||'')}" placeholder="e.g. Sakura — Naruto">`)
+      +fld('Stage',`<select id="k-st">${VID_STAGES.map(([k,e,l])=>`<option value="${k}" ${k===v.stage?'selected':''}>${e} ${l}</option>`).join('')}</select>`)
+      +fld('Why you believe it',`<textarea id="k-tk" rows="2" placeholder="The argument, in one breath.">${esc(v.take||'')}</textarea>`)
+      +fld('Strongest case against you',`<textarea id="k-sm" rows="2" placeholder="Fill this in at the steelman step.">${esc(v.steelman||'')}</textarea>`),
+    save:async()=>{
+      const rec={title:$('#k-t').value.trim(),subject:$('#k-sub').value.trim()||null,
+        stage:$('#k-st').value,take:$('#k-tk').value.trim()||null,
+        steelman:$('#k-sm').value.trim()||null,updated_at:new Date().toISOString()};
+      if(!rec.title){toast('Give it a take first');return false;}
+      if(isNew)rec.sort=v.sort;
+      const {error}=isNew?await sb.from('hq_videos').insert(rec):await sb.from('hq_videos').update(rec).eq('id',v.id);
+      if(error)throw error;
+    },
+    del:isNew?null:async()=>{const {error}=await sb.from('hq_videos').delete().eq('id',v.id);if(error)throw error;}});
 }
 
 function habitRow(h,editable){
@@ -1407,7 +1556,7 @@ function renderGrind(){
   const ruOn=ruH&&habitDone(ruH.id);
 
   $('#v-grind').innerHTML=
-   `<div class="sect"><h2>Body</h2><span class="cnt">${bodyWeek().slots}/7 slots</span></div>
+   `<div class="sect"><h2>Body</h2><span class="cnt">${(BODY_KINDS.find(x=>x[0]===(bodyOn()||bodyNeeds()))||[,,"—"])[2]}</span></div>
     <div class="tile" id="g-body"></div>
 
     <div class="sect"><h2>Russian</h2><span class="cnt">${lvl>=RU_LADDER.length?'ТРКИ-1 ✓':RU_LADDER[lvl][0]}</span></div>
@@ -1426,6 +1575,9 @@ function renderGrind(){
 
     ${rest.length?`<div class="sect"><h2>Daily</h2><span class="cnt">${rest.filter(h=>habitDone(h.id)).length}/${rest.length}</span></div>
     <div class="list" id="g-hb"></div>`:''}
+
+    <div class="sect"><h2>Channel</h2><span class="cnt">${VIDEOS.filter(v=>v.stage!=='posted').length} in flight</span></div>
+    <div class="tile" id="g-yt"></div>
 
     <div class="sect"><h2>Progress</h2><span class="cnt">optional</span></div>
     <div class="tile tap" id="g-weight">
@@ -1448,6 +1600,7 @@ function renderGrind(){
     $('#g-lad').querySelectorAll('.st').forEach(s=>s.onclick=()=>setRuLevel(Number(s.dataset.i),lvl));
   }
   if($('#g-hb'))rest.forEach(h=>$('#g-hb').appendChild(habitRow(h,true)));
+  paintYT($('#g-yt'));
   $('#g-weight').onclick=()=>sheetWeight();
   paintPhotos();
 }
