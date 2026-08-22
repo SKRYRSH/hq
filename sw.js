@@ -1,4 +1,4 @@
-const CACHE = 'weebji-hq-v6';
+const CACHE = 'weebji-hq-v7';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './favicon.png'];
 
 self.addEventListener('install', (e) => {
@@ -15,6 +15,16 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const u = new URL(e.request.url);
+  // The supabase library comes from a CDN. If that CDN is blocked (Russia) the
+  // whole app dies at the login screen, so cache it on first success and serve
+  // it from cache forever after. API/auth traffic is still never touched.
+  if (/(^|\.)(unpkg\.com|jsdelivr\.net|cloudflare\.com)$/.test(u.hostname)) {
+    e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request).then((res) => {
+      if (res && res.ok) { const c = res.clone(); caches.open(CACHE).then((k) => k.put(e.request, c)); }
+      return res;
+    })));
+    return;
+  }
   if (u.origin !== location.origin) return; // never touch Supabase/API traffic
   if (e.request.mode === 'navigate') {
     e.respondWith(fetch(e.request).catch(() => caches.match('./index.html'))); // fresh app, offline fallback

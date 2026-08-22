@@ -110,6 +110,10 @@
   .stg.gray{background:#f0ede7;color:#948c7e}
   .money{font-size:13px;font-weight:800;color:var(--ink2)}
 
+  /* offline / pending-sync bar — informational, never alarming */
+  #netbar{margin:0 0 2px;padding:9px 14px;border-radius:13px;background:#fff5e6;color:#8a5a00;
+    font-size:12.5px;font-weight:800;text-align:center;border:1px solid #f2dfbd}
+
   /* ---- fab ---- */
   .fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:30;
     height:54px;padding:0 22px 0 18px;border-radius:18px;background:var(--primary);color:#fff;
@@ -417,6 +421,7 @@
 
 <!-- APP -->
 <div id="app" class="hidden">
+  <div id="netbar" class="hidden"></div>
   <header>
     <div class="hi">
       <h1 id="greet">Hey 👋</h1>
@@ -563,13 +568,95 @@ $('#signin').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{red
 $('#signout').onclick=async()=>{await sb.auth.signOut();location.reload();};
 
 async function boot(){
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){$('#login').classList.remove('hidden');return;}
-  if(session.user.email!==OWNER_EMAIL){await sb.auth.signOut();$('#login').classList.remove('hidden');loginMsg("That account isn't authorized.",true);return;}
+  let session=null;
+  try{ ({data:{session}}=await sb.auth.getSession()); }catch(_){ session=null; }
+  if(session&&session.user.email!==OWNER_EMAIL){
+    await sb.auth.signOut();$('#login').classList.remove('hidden');
+    loginMsg("That account isn't authorized.",true);return;
+  }
+  // No session AND no network is not the same as "not logged in". If he has
+  // signed in on this device before and there is a local mirror, let him in —
+  // the data is already on his phone and locking him out protects nothing.
+  if(!session){
+    const seen=localStorage.getItem('hq_authed')==='1';
+    if(!(seen&&snapLoad())){$('#login').classList.remove('hidden');return;}
+    $('#login').classList.add('hidden');$('#app').classList.remove('hidden');
+    netMark(true);setView(VIEW);render();
+    toast('Offline — showing your last synced copy');
+    return;
+  }
+  localStorage.setItem('hq_authed','1');
   $('#login').classList.add('hidden');$('#app').classList.remove('hidden');
+  await flush();
   await load();setView(VIEW);subscribeRealtime();refreshBell();
 }
 sb.auth.onAuthStateChange((_e,s)=>{if(s&&$('#app').classList.contains('hidden'))boot();});
+
+/* ---------- offline: local mirror + write outbox ----------
+   Russia is the reason this exists. Roskomnadzor throttling, a dead cafe wifi,
+   a Supabase outage — HQ is his life system and it has to open and accept a tap
+   with no network at all. Every successful load is mirrored to localStorage;
+   every daily write is applied locally first and replayed when the net returns. */
+const SNAP='hq_snap', OUTBOX_K='hq_outbox';
+let OUTBOX=[]; try{OUTBOX=JSON.parse(localStorage.getItem(OUTBOX_K)||'[]');}catch(_){OUTBOX=[];}
+let OFFLINE=false;
+
+function snapSave(){
+  try{localStorage.setItem(SNAP,JSON.stringify({at:Date.now(),
+    CLIENTS,SETTINGS,LEDGER,GOALS,DOCS,DEADLINES,HABITS,HLOGS,WEIGHTS,LIFE,BODY,READY,PHOTOS,VIDEOS}));
+  }catch(_){/* quota — the app still works, it just won't survive a cold start */}
+}
+function snapLoad(){
+  try{
+    const s=JSON.parse(localStorage.getItem(SNAP)||'null'); if(!s)return false;
+    CLIENTS=s.CLIENTS||[];SETTINGS=s.SETTINGS||{};LEDGER=s.LEDGER||[];GOALS=s.GOALS||[];
+    DOCS=s.DOCS||[];DEADLINES=s.DEADLINES||[];HABITS=s.HABITS||[];HLOGS=s.HLOGS||[];
+    WEIGHTS=s.WEIGHTS||[];LIFE=s.LIFE||{};BODY=s.BODY||[];READY=s.READY||[];
+    PHOTOS=s.PHOTOS||[];VIDEOS=s.VIDEOS||[];
+    return true;
+  }catch(_){return false;}
+}
+function outSave(){try{localStorage.setItem(OUTBOX_K,JSON.stringify(OUTBOX));}catch(_){}}
+function netMark(off){
+  OFFLINE=off;const b=$('#netbar');if(!b)return;
+  if(off||OUTBOX.length){
+    b.classList.remove('hidden');
+    b.textContent=OUTBOX.length
+      ? `Saved on this device · ${OUTBOX.length} change${OUTBOX.length>1?'s':''} waiting to sync`
+      : 'Offline — everything still works, it syncs when you\'re back';
+  }else b.classList.add('hidden');
+}
+function runOp(o){
+  const f=sb.from(o.table);
+  if(o.kind==='insert')return f.insert(o.rec);
+  if(o.kind==='update')return f.update(o.rec).eq(o.col||'id',o.id);
+  if(o.kind==='upsert')return f.upsert(o.rec,o.conflict?{onConflict:o.conflict}:undefined);
+  if(o.kind==='delete')return f.delete().eq(o.col||'id',o.id);
+  if(o.kind==='delete2')return f.delete().eq(o.col,o.id).eq(o.col2,o.id2); // habit log = habit + date
+  return Promise.resolve({error:null});
+}
+// Try a write now; if the network is gone, keep it and replay later.
+// Callers update local state themselves and are expected NOT to roll back.
+async function sync(op){
+  try{
+    const r=await runOp(op); if(r&&r.error)throw r.error;
+    netMark(false); return true;
+  }catch(_){
+    OUTBOX.push(op); outSave(); netMark(true); snapSave(); return false;
+  }
+}
+async function flush(){
+  if(!OUTBOX.length)return;
+  const keep=[];
+  for(const o of OUTBOX){
+    try{const r=await runOp(o); if(r&&r.error)throw r.error;}
+    catch(_){keep.push(o);}
+  }
+  const sent=OUTBOX.length-keep.length;
+  OUTBOX=keep; outSave(); netMark(keep.length>0);
+  if(sent)toast(`Synced ${sent} change${sent>1?'s':''} ✓`);
+}
+window.addEventListener('online',()=>{flush().then(()=>load());});
 
 /* ---------- data ---------- */
 async function load(){
@@ -589,11 +676,18 @@ async function load(){
     sb.from('hq_photos').select('*').order('on_date',{ascending:false}).limit(60),
     sb.from('hq_videos').select('*').order('sort')
   ]);
-  if(clientsRes.error){toast('Couldn\'t load');return;}
+  // Network is down (or Supabase is): fall back to the device mirror and carry on.
+  if(clientsRes.error){
+    const had=snapLoad();
+    netMark(true);
+    toast(had?'Offline — showing your last synced copy':'Offline and nothing saved on this device yet');
+    render();return;
+  }
   CLIENTS=clientsRes.data||[]; SETTINGS=stRes.data||SETTINGS||{};
   LEDGER=ledRes.data||[]; GOALS=goalRes.data||[]; DOCS=docRes.data||[]; DEADLINES=dlRes.data||[];
   HABITS=hbRes.data||[]; HLOGS=hlRes.data||[]; WEIGHTS=wtRes.data||[]; LIFE=(lifeRes.data&&lifeRes.data.data)||{};
   BODY=bdRes.data||[]; READY=rdRes.data||[]; PHOTOS=phRes.data||[]; VIDEOS=vidRes.data||[];
+  netMark(false); snapSave();
   render();
 }
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
@@ -1038,12 +1132,13 @@ function weekMarks(id){
 async function toggleHabit(id){
   const d=today();
   if(habitDone(id,d)){
-    await sb.from('hq_habit_logs').delete().eq('habit_id',id).eq('on_date',d);
     HLOGS=HLOGS.filter(l=>!(l.habit_id===id&&l.on_date===d));
+    render();snapSave();
+    await sync({table:'hq_habit_logs',kind:'delete2',col:'habit_id',id,col2:'on_date',id2:d});
   }else{
-    const {error}=await sb.from('hq_habit_logs').insert({habit_id:id,on_date:d});
-    if(error){toast('Could not save');return;}
     HLOGS.push({habit_id:id,on_date:d});
+    render();snapSave();
+    await sync({table:'hq_habit_logs',kind:'insert',rec:{habit_id:id,on_date:d}});
     if(HABITS.every(h=>!h.active||habitDone(h.id,d))){confetti();toast('All done today 🔥');}
   }
   render();
@@ -1133,13 +1228,16 @@ function bodyCycle(){
 }
 async function logBody(kind){
   const d=today();
+  // Local state changes first, then the network is attempted. A tap must never
+  // be refused for being offline — the whole point is that it always lands.
   if(bodyOn(d)===kind){
-    await sb.from('hq_body_log').delete().eq('on_date',d);
     BODY=BODY.filter(b=>b.on_date!==d);
+    render();snapSave();
+    await sync({table:'hq_body_log',kind:'delete',col:'on_date',id:d});
   }else{
-    const {error}=await sb.from('hq_body_log').upsert({on_date:d,kind},{onConflict:'on_date'});
-    if(error){toast('Could not save');return;}
     BODY=BODY.filter(b=>b.on_date!==d);BODY.unshift({on_date:d,kind});
+    render();snapSave();
+    await sync({table:'hq_body_log',kind:'upsert',rec:{on_date:d,kind},conflict:'on_date'});
     // Run closes the rotation — the only moment worth a celebration.
     if(kind==='run'){confetti();toast('Full rotation — push, pull, legs, run 💪');}
   }
@@ -1466,9 +1564,8 @@ function vidActive(){
 async function toggleStep(id,key){
   const v=VIDEOS.find(x=>x.id===id);if(!v)return;
   const steps={...vidSteps(v)};steps[key]=!steps[key];
-  const {error}=await sb.from('hq_videos').update({steps,updated_at:new Date().toISOString()}).eq('id',id);
-  if(error){toast('Could not save');return;}
-  v.steps=steps;render();
+  v.steps=steps;render();snapSave();
+  await sync({table:'hq_videos',kind:'update',id,rec:{steps,updated_at:new Date().toISOString()}});
 }
 function paintYT(node){
   if(!node)return;
@@ -1611,9 +1708,8 @@ async function setRuLevel(i,lvl){
   const next=(i===lvl)?i+1:i;
   if(next===lvl)return;
   const data={...LIFE,ru_level:next};
-  const {error}=await sb.from('hq_life').upsert({id:'main',data,updated_at:new Date().toISOString()},{onConflict:'id'});
-  if(error){toast('Could not save');return;}
-  LIFE=data;
+  LIFE=data;render();snapSave();
+  await sync({table:'hq_life',kind:'upsert',rec:{id:'main',data,updated_at:new Date().toISOString()},conflict:'id'});
   if(next>lvl){confetti();toast(next>=RU_LADDER.length?'ТРКИ-1 🇷🇺 that was the whole target':RU_LADDER[next-1][0]+' cleared ✓');}
   render();
 }
@@ -1890,9 +1986,24 @@ boot();
 (function load(cdns){
   if(window.supabase) return initApp();
   if(!cdns.length){
-    const m=document.getElementById('login-msg');
-    if(m){ m.classList.remove('hidden'); m.textContent="Couldn't load on this network — try another connection or Wi-Fi."; m.style.color='#ef4b5b'; }
-    return;
+    // Every CDN is unreachable — no network, or Russia blocking them. His data
+    // is already on this device, so run fully local instead of showing a wall.
+    // Every call fails by design: load() falls back to the snapshot and sync()
+    // parks writes in the outbox until a real client can replay them.
+    const dead=()=>{const r={select:()=>r,order:()=>r,gte:()=>r,limit:()=>r,eq:()=>r,
+      maybeSingle:()=>Promise.reject(new Error('offline')),
+      then:(_res,rej)=>Promise.reject(new Error('offline')).then(_res,rej),
+      catch:f=>Promise.reject(new Error('offline')).catch(f),
+      insert:()=>Promise.reject(new Error('offline')),update:()=>r,upsert:()=>Promise.reject(new Error('offline')),delete:()=>r};
+      return r;};
+    window.supabase={createClient:()=>({from:dead,
+      auth:{getSession:()=>Promise.resolve({data:{session:null}}),onAuthStateChange(){},
+            signOut:()=>Promise.resolve(),signInWithOAuth(){
+              const m=document.getElementById('login-msg');
+              if(m){m.classList.remove('hidden');m.textContent="Can't reach the network to sign in. Your saved copy still opens offline.";m.style.color='#ef4b5b';}}},
+      channel:()=>({on(){return this},subscribe(){}}),
+      storage:{from:()=>({createSignedUrl:()=>Promise.resolve({data:null}),upload:()=>Promise.reject(new Error('offline'))})}})};
+    return initApp();
   }
   const s=document.createElement('script'); s.src=cdns[0];
   s.onload=()=> window.supabase ? initApp() : load(cdns.slice(1));
