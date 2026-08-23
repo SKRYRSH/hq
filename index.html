@@ -351,6 +351,12 @@
   .flow .fs.dn .ft{color:var(--mut);text-decoration:line-through}
   .flow .ft{font-size:13.5px;font-weight:800;line-height:1.3}
   .flow .fd{font-size:12px;font-weight:600;color:var(--mut);margin-top:2px;line-height:1.4}
+  .fmt{margin-top:13px;padding:12px 13px;border-radius:15px;background:#f6f4ff;border:1px solid var(--line)}
+  .fmt .fh{font-size:10.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:var(--primary)}
+  .fmt .fr{display:flex;gap:10px;margin-top:9px}
+  .fmt .fr .tc{width:66px;flex-shrink:0;font-size:11px;font-weight:900;color:var(--mut);padding-top:1px;font-variant-numeric:tabular-nums}
+  .fmt .fb{font-size:12.5px;font-weight:800;line-height:1.3}
+  .fmt .fp{font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.4;margin-top:1px}
   .ytlist{margin-top:14px;border-top:1px solid var(--line)}
   .ytrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
   .ytrow:last-child{border-bottom:0}
@@ -521,20 +527,30 @@ let BODY=[], READY=[], PHOTOS=[], PHOTO_URLS={}, VIDEOS=[];
    One take per video, argued properly. The pipeline is a position, not a
    deadline — a video can sit in a stage for a month without that being a
    failure. Same rule as the body rotation. */
-const VID_STAGES=[['idea','💡','Idea'],['research','🔎','Research'],['script','✍️','Script'],
-                  ['shot','🎬','Shot'],['edit','✂️','Edit'],['posted','🚀','Posted']];
+const VID_STAGES=[['idea','💡','Idea'],['research','🔎','Answer'],['script','✍️','Script'],
+                  ['shot','🎙️','Voice'],['edit','✂️','Edit'],['posted','🚀','Posted']];
+// THE FORMAT — decided 2026-08-23, and there is only one. ~30s, faceless, 3/week.
+// Reach comes from the title (a real Hindi search question). Identity comes from
+// the last ten seconds. Do not add a second format at this subscriber count.
+const FORMAT=[
+  ['0:00–0:03','The sting','The same three seconds every single time. That repetition is the recognition.'],
+  ['0:03–0:18','The lore answer','Straight, no throat-clearing. This is what the search traffic came for.'],
+  ['0:18–0:28','"Weebji ki bakwaas:"','Your verdict. The take. The only part nobody else could have made.']
+];
 // The workflow he asked for: what he actually does, in order. AI does the
 // homework; the words stay his, because the voice IS the product.
 const SCRIPT_FLOW=[
-  ['take','Say the take in one line','Hindi, the way you\'d say it to a friend. If it needs a paragraph, it isn\'t a take yet.'],
-  ['recpt','Get the receipts','Ask an AI for the arcs, feats and moments that back you up. This is homework, not writing.'],
-  ['steel','Write the case AGAINST you','Ask for the strongest counter-argument. Write the best one down. If you can\'t answer it, drop the take — that\'s a win too.'],
-  ['talk','Talk it out for 5 minutes','Record yourself arguing it. No script. This is the only step that produces your actual voice.'],
-  ['struct','Cut the ramble into 3 points','Best argument last. Everything that isn\'t one of the three goes.'],
-  ['cold','Write the first 15 seconds word-for-word','Only the cold open is scripted. The rest stays loose or it sounds read.'],
-  ['shoot','Shoot it — take first, sting after','Face on camera. No "hey guys". The take is the first thing out of your mouth.'],
-  ['shorts','Pull 4–5 Hindi search questions','Same character, question-shaped titles. They rank in search and point back here.']
+  ['q','Pick the Hindi search question','Type the title the way someone would actually type it into YouTube. No question, no reach — the title IS the video.'],
+  ['ans','Get the lore answer','Ask an AI for the arcs, chapters and feats. Homework, not writing. You need fifteen seconds of straight fact.'],
+  ['take','Write the bakwaas line','"Weebji ki bakwaas:" then your verdict, one line. Never let an AI write this one — it is the entire brand.'],
+  ['script','Write the ~85 words','That is thirty seconds. Read it out loud once: stumble on a word and you would never have said it.'],
+  ['vo','Record the voice — one take','Phone mic, close, no room echo. Answering a friend, not reading a page.'],
+  ['cut','B-roll, burned captions, the sting','Same sting, same font, same corner, every time. Consistency is doing the work here, not polish.'],
+  ['post','Post it — title = the question','Verbatim, exactly as you typed it in step one. Then start the next one.']
 ];
+// Long-form is PARKED until ~10K subs (long-forms earn ~2% of subscribers, so
+// 432 subs ≈ 9 views — nothing was wrong with the videos). When it resumes it
+// needs a NAMED repeatable format, never a one-off essay.
 let VIEW=localStorage.getItem('hq_view')||'today';
 let LEDGER_FILTER='all';
 
@@ -1567,20 +1583,28 @@ async function toggleStep(id,key){
   v.steps=steps;render();snapSave();
   await sync({table:'hq_videos',kind:'update',id,rec:{steps,updated_at:new Date().toISOString()}});
 }
+const fmtHTML=()=>
+ `<div class="fmt"><div class="fh">The format · ~30s · faceless</div>
+    ${FORMAT.map(([t,b,d])=>`<div class="fr"><div class="tc">${t}</div>
+      <div><div class="fb">${b}</div><div class="fp">${d}</div></div></div>`).join('')}
+    <div class="fp" style="margin-top:9px">Title = a real Hindi search question. Naruto first — own one well before you spread.</div>
+  </div>`;
 function paintYT(node){
   if(!node)return;
   const act=vidActive();
   const posted=VIDEOS.filter(v=>v.stage==='posted').length;
   if(!VIDEOS.length){
     node.innerHTML=`<div class="empty" style="padding:22px 14px">No takes yet.<br>
-      <span style="font-size:12.5px">Write down one you'd defend at 2am.</span></div>
-      <button class="btn ghost" id="yt-add">+ New take</button>`;
+      <span style="font-size:12.5px">Start with a question someone would actually search.</span></div>
+      ${fmtHTML()}
+      <button class="btn ghost" id="yt-add" style="margin-top:12px">+ New take</button>`;
     $('#yt-add').onclick=()=>sheetVideo(null);
     return;
   }
   const st=act?vidStage(act):null;
   node.innerHTML=
    `<div class="mhead"><div class="t">WEEBJI KI BAKWAAS</div><div class="pc" style="font-size:18px">${posted}<span style="font-size:12px;color:var(--mut)"> posted</span></div></div>
+    ${fmtHTML()}
     ${act?`<div class="ytnow">
         <div class="ytst">${st[1]} ${st[2]}</div>
         <div class="ytt">${esc(act.title)}</div>
@@ -1610,11 +1634,11 @@ function paintYT(node){
 function sheetVideo(v){
   const isNew=!v;v=v||{stage:'idea',sort:(VIDEOS.length?Math.max(...VIDEOS.map(x=>x.sort||0)):0)+1};
   openForm({title:isNew?'New take':'Video',emoji:'🎬',color:'#6d5efc',
-    fields:fld('The take (one line)',`<input id="k-t" value="${esc(v.title||'')}" placeholder="e.g. Sakura trash nahi hai">`)
-      +fld('Character / anime',`<input id="k-sub" value="${esc(v.subject||'')}" placeholder="e.g. Sakura — Naruto">`)
+    fields:fld('Title — the Hindi search question',`<input id="k-t" value="${esc(v.title||'')}" placeholder="e.g. Tsunade itni strong kyun hai?">`)
+      +fld('Character / anime',`<input id="k-sub" value="${esc(v.subject||(isNew?'Naruto':''))}" placeholder="e.g. Tsunade — Naruto">`)
       +fld('Stage',`<select id="k-st">${VID_STAGES.map(([k,e,l])=>`<option value="${k}" ${k===v.stage?'selected':''}>${e} ${l}</option>`).join('')}</select>`)
-      +fld('Why you believe it',`<textarea id="k-tk" rows="2" placeholder="The argument, in one breath.">${esc(v.take||'')}</textarea>`)
-      +fld('Strongest case against you',`<textarea id="k-sm" rows="2" placeholder="Fill this in at the steelman step.">${esc(v.steelman||'')}</textarea>`),
+      +fld('The bakwaas line (last 10 seconds)',`<textarea id="k-tk" rows="2" placeholder="Weebji ki bakwaas: ...">${esc(v.take||'')}</textarea>`)
+      +fld('The lore answer (first 15 seconds)',`<textarea id="k-sm" rows="3" placeholder="The straight answer, in the order you'll say it.">${esc(v.steelman||'')}</textarea>`),
     save:async()=>{
       const rec={title:$('#k-t').value.trim(),subject:$('#k-sub').value.trim()||null,
         stage:$('#k-st').value,take:$('#k-tk').value.trim()||null,
