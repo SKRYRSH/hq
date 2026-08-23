@@ -529,7 +529,10 @@ let BODY=[], READY=[], PHOTOS=[], PHOTO_URLS={}, VIDEOS=[];
    failure. Same rule as the body rotation. */
 const VID_STAGES=[['idea','💡','Idea'],['research','🔎','Answer'],['script','✍️','Script'],
                   ['shot','🎙️','Voice'],['edit','✂️','Edit'],['posted','🚀','Posted']];
-// THE FORMAT — decided 2026-08-23, and there is only one. ~30s, faceless, 3/week.
+// THE FORMAT — decided 2026-08-23, and there is only one. ~30s, 3/week.
+// NO FACE, BUT ALWAYS HIS VOICE. The b-roll carries the information; the voice
+// carries the person. Strip the voice and there is no personal brand left — his
+// own correction, and it is the right one. Never write "faceless" unqualified here.
 // Reach comes from the title (a real Hindi search question). Identity comes from
 // the last ten seconds. Do not add a second format at this subscriber count.
 const FORMAT=[
@@ -544,7 +547,7 @@ const SCRIPT_FLOW=[
   ['ans','Get the lore answer','Ask an AI for the arcs, chapters and feats. Homework, not writing. You need fifteen seconds of straight fact.'],
   ['take','Write the bakwaas line','"Weebji ki bakwaas:" then your verdict, one line. Never let an AI write this one — it is the entire brand.'],
   ['script','Write the ~85 words','That is thirty seconds. Read it out loud once: stumble on a word and you would never have said it.'],
-  ['vo','Record the voice — one take','Phone mic, close, no room echo. Answering a friend, not reading a page.'],
+  ['vo','Record the voice — one take','Phone mic, close, no room echo. Answering a friend, not reading a page. This step IS the brand — the face is optional, the voice never is.'],
   ['cut','B-roll, burned captions, the sting','Same sting, same font, same corner, every time. Consistency is doing the work here, not polish.'],
   ['post','Post it — title = the question','Verbatim, exactly as you typed it in step one. Then start the next one.']
 ];
@@ -1584,7 +1587,7 @@ async function toggleStep(id,key){
   await sync({table:'hq_videos',kind:'update',id,rec:{steps,updated_at:new Date().toISOString()}});
 }
 const fmtHTML=()=>
- `<div class="fmt"><div class="fh">The format · ~30s · faceless</div>
+ `<div class="fmt"><div class="fh">The format · ~30s · your voice, no face</div>
     ${FORMAT.map(([t,b,d])=>`<div class="fr"><div class="tc">${t}</div>
       <div><div class="fb">${b}</div><div class="fp">${d}</div></div></div>`).join('')}
     <div class="fp" style="margin-top:9px">Title = a real Hindi search question. Naruto first — own one well before you spread.</div>
