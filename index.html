@@ -351,6 +351,31 @@
   .flow .fs.dn .ft{color:var(--mut);text-decoration:line-through}
   .flow .ft{font-size:13.5px;font-weight:800;line-height:1.3}
   .flow .fd{font-size:12px;font-weight:600;color:var(--mut);margin-top:2px;line-height:1.4}
+  /* Russia: readable cards instead of a formal register */
+  .kv{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .kv:last-child{border-bottom:0}
+  .kv .mk{flex-shrink:0;width:22px;font-size:15px;line-height:1.35}
+  .kv .kt{font-size:13.5px;font-weight:800;line-height:1.35}
+  .kv .kd{font-size:12.5px;font-weight:600;color:var(--ink2);line-height:1.5;margin-top:3px}
+  .kv .kl{font-size:10.5px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--mut)}
+  .kv.no .kt{color:var(--ink2)}
+  .dc{background:var(--card);border:1px solid var(--line);border-radius:15px;margin-bottom:9px;overflow:hidden}
+  .dc .dh{display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer}
+  .dc .dh .ico{font-size:17px;flex-shrink:0}
+  .dc .dh .mid{flex:1;min-width:0}
+  .dc .dh .t1{font-size:14px;font-weight:800;line-height:1.3}
+  .dc .dh .t2{font-size:12px;font-weight:600;color:var(--mut);margin-top:2px}
+  .dc .dh .t2.bad{color:#d9534f}
+  .dc .chev{color:var(--mut);font-size:15px;flex-shrink:0;transition:transform .15s}
+  .dc.open .chev{transform:rotate(90deg)}
+  .dc .db{display:none;padding:0 14px 14px 47px}
+  .dc.open .db{display:block}
+  .dc .db p{font-size:13px;font-weight:600;color:var(--ink2);line-height:1.6}
+  .dc .db .ed{margin-top:11px;font-size:12.5px;font-weight:800;color:var(--primary);cursor:pointer;
+    background:none;border:none;padding:0}
+  .cta{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+  .cta a{font-size:12.5px;font-weight:800;color:var(--primary);text-decoration:none;
+    background:var(--card2);padding:8px 12px;border-radius:11px}
   .fmt{margin-top:13px;padding:12px 13px;border-radius:15px;background:#f6f4ff;border:1px solid var(--line)}
   .fmt .fh{font-size:10.5px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:var(--primary)}
   .fmt .fr{display:flex;gap:10px;margin-top:9px}
@@ -554,6 +579,40 @@ const SCRIPT_FLOW=[
 // Long-form is PARKED until ~10K subs (long-forms earn ~2% of subscribers, so
 // 432 subs ≈ 9 views — nothing was wrong with the videos). When it resumes it
 // needs a NAMED repeatable format, never a one-off essay.
+/* ---- RUSSIA REFERENCE ----
+   Hardcoded on purpose. These are stable facts he keeps having to re-ask or
+   re-derive from a Telegram group, and hardcoding means they are readable with
+   no network at all — the same reason the mirror exists. Plain language, because
+   the point of this section is that he can understand it at 1am without a lawyer. */
+const QUOTA=[
+  ['yes','Tuition — the whole prep year, then the degree',
+   'Paid out of the Russian federal budget. That is what "за счёт средств бюджета РФ" means on your award. You are never billed for studying. This is the big one and it is not in question.'],
+  ['yes','A dorm place, at the budget-student rate',
+   'Not free, but priced for budget students, not at market. Nationally that is ₽1,000–4,000/month. Three students in your own group quoted ₽2,500 (MISIS) and ₽3,000. РГАИС has never put its own number in writing — that is the one real gap.'],
+  ['yes','A monthly stipend',
+   'Quota students get the государственная академическая стипендия regardless of grades — around ₽2,000/month. Whether prep-year слушатели at РГАИС receive it is genuinely unconfirmed. It is the other half of the dorm question, which is why they get asked together.'],
+  ['no','Health insurance (ДМС)',
+   'Yours. ₽11,000–15,000 in Moscow, compulsory within 15 days of landing. Budget for it as an arrival cost, not a monthly one.'],
+  ['no','Flights, visa fees, notarisation, courier',
+   'Yours. The consular state fee is about ₽960. The Delhi trip, the translations and the medicals are all on you too.'],
+  ['no','Food, transport, phone — daily life',
+   'Yours, and this is the number that actually decides whether Moscow works. The stipend does not cover living; it roughly cancels the dorm. Everything else comes from the arrival fund and what you earn.']
+];
+const LIVE_HERE=[
+  ['Dorm','Московская обл., г. Домодедово, мкр. Северный, ул. Каширское шоссе, д. 4 к. 3',
+   'Confirmed in writing for the whole prep year: "Общежитие предоставляется Вам на весь срок обучения." Not an arrival stopgap — it is yours.'],
+  ['What it is','Blocks of 2–3 bed rooms, shared bathroom and shower, separate kitchen and laundry',
+   'Straight from РГАИС’s own site. You will be sharing a room. You sign a Договор найма жилого помещения, and the placement is arranged through the prep department, office 109.'],
+  ['Academy','Москва, ул. Миклухо-Маклая, д. 55а — метро Беляево',
+   'Domodedovo is Moscow Oblast, not Moscow — roughly 40–50 km out, the airport town. Realistically about 1.5h each way. Cost it in time and in transport money before you are surprised by it.']
+];
+const CONTACTS=[
+  ['РГАИС prep department','russian@rgiis.ru','+7 495 330-10-29','Your existing thread. Replies in about a day. They answer academic and arrival questions.'],
+  ['Дорм office, Domodedovo','domodedovo@rgiis.ru','+7 496 793-52-30','The building itself, separate from the academy. The dorm price is THEIR question, not the prep department’s.'],
+  ['Russian House India','','','Rossotrudnichestvo owns the IND- stream. This is the escalation door if the визовое указание field is still blank around mid-September — not РГАИС.']
+];
+// The rule the Telegram group surfaced on 2026-08-23 and the checklist did not have.
+const ENTRY_RULE='Your visa carries an ENTRY DATE, and the 90-day single-entry clock starts from it — not from the day you land. Registration (7 working days), the multi-entry conversion, SNILS, the bank and the Mir card all have to fit inside that window. Land three weeks late and you have burned a third of it before unpacking. So: book the flight tight to the entry date, and do documentation before classes.';
 let VIEW=localStorage.getItem('hq_view')||'today';
 let LEDGER_FILTER='all';
 
@@ -1454,8 +1513,38 @@ function renderRussia(){
     ${blocked.length?`<div class="sect" style="margin-top:20px"><h2 style="font-size:14.5px">⏸ Waiting on them</h2><span class="cnt">not yours</span></div>
     <div class="list" id="r-blocked"></div>`:''}
 
-    <div class="sect" style="margin-top:20px"><h2>Document vault</h2><span class="cnt">${done}/${DOCS.length} done</span></div>
-    <div id="r-docs"></div>`;
+    <div class="sect" style="margin-top:22px"><h2>What the scholarship actually pays</h2></div>
+    <div class="tile">
+      ${QUOTA.map(([k,t,d])=>`<div class="kv ${k==='no'?'no':''}">
+        <div class="mk">${k==='yes'?'✅':'❌'}</div>
+        <div><div class="kt">${t}</div><div class="kd">${d}</div></div></div>`).join('')}
+      <div class="bnote">Green is covered, red comes out of your pocket. The dorm and the stipend are the only
+        two numbers nobody has confirmed — and they roughly cancel each other, which is why one email settles both.</div>
+    </div>
+
+    <div class="sect" style="margin-top:22px"><h2>Where you'll live</h2></div>
+    <div class="tile">
+      ${LIVE_HERE.map(([l,t,d])=>`<div class="kv">
+        <div><div class="kl">${l}</div><div class="kt" style="margin-top:3px">${t}</div>
+        <div class="kd">${d}</div></div></div>`).join('')}
+    </div>
+
+    <div class="sect" style="margin-top:22px"><h2>The entry-date rule</h2></div>
+    <div class="tile">
+      <div class="kd" style="margin:0">${ENTRY_RULE}</div>
+    </div>
+
+    <div class="sect" style="margin-top:22px"><h2>Documents</h2><span class="cnt">${done}/${DOCS.length} done</span></div>
+    <div class="bnote" style="margin:0 0 12px">Tap any document to read the whole thing. Nothing is truncated here.</div>
+    <div id="r-docs"></div>
+
+    <div class="sect" style="margin-top:22px"><h2>Who to actually contact</h2></div>
+    <div class="tile">
+      ${CONTACTS.map(([n,e,ph,d])=>`<div class="kv">
+        <div style="flex:1"><div class="kt">${n}</div><div class="kd">${d}</div>
+          ${e||ph?`<div class="cta">${e?`<a href="mailto:${e}">${e}</a>`:''}${ph?`<a href="tel:${ph.replace(/[^+0-9]/g,'')}">${ph}</a>`:''}</div>`:''}
+        </div></div>`).join('')}
+    </div>`;
 
   $('#r-stage').onclick=()=>sheetStage();
 
@@ -1475,20 +1564,26 @@ function renderRussia(){
   const box=$('#r-docs');
   order.filter(k=>groups[k]).forEach(k=>{
     box.appendChild(el(`<div class="sect" style="margin-top:18px"><h2 style="font-size:14.5px">${gname[k]}</h2></div>`));
-    const wrap=el(`<div class="list"></div>`);
     groups[k].forEach(d=>{
       const exp=d.expires_on?daysBetween(today(),d.expires_on):null;
       const warn=exp!==null&&exp<=30;
-      const n=el(`<div class="ri tap">
-        <div class="ico">${d.status==='done'?'✅':d.status==='doing'?'⏳':'⬜'}</div>
-        <div class="mid"><div class="t1">${esc(d.name)}</div>
-          <div class="t2 ${warn?'bad':''}">${d.expires_on?('expires '+relDay(d.expires_on)):(d.note?esc(d.note).slice(0,58)+(d.note.length>58?'…':''):docStatusLabel(d.status))}</div></div>
-        <span class="pill ${d.status==='done'?'done':d.status==='doing'?'doing':warn?'warn':'todo'}">${docStatusLabel(d.status)}</span>
+      // The note IS the value. Truncating it to 58 characters was the reason this
+      // section read like a form — the card opens and shows all of it instead.
+      const n=el(`<div class="dc">
+        <div class="dh">
+          <div class="ico">${d.status==='done'?'✅':d.status==='doing'?'⏳':'⬜'}</div>
+          <div class="mid"><div class="t1">${esc(d.name)}</div>
+            <div class="t2 ${warn?'bad':''}">${d.expires_on?('expires '+relDay(d.expires_on)):docStatusLabel(d.status)}${d.cost?' · '+esc(d.cost)+' '+esc(d.currency||''):''}</div></div>
+          <span class="pill ${d.status==='done'?'done':d.status==='doing'?'doing':warn?'warn':'todo'}">${docStatusLabel(d.status)}</span>
+          <span class="chev">›</span>
+        </div>
+        <div class="db"><p>${d.note?esc(d.note):'No notes on this one yet.'}</p>
+          <button class="ed">Edit this</button></div>
       </div>`);
-      n.onclick=()=>sheetDoc(d);
-      wrap.appendChild(n);
+      n.querySelector('.dh').onclick=()=>n.classList.toggle('open');
+      n.querySelector('.ed').onclick=e=>{e.stopPropagation();sheetDoc(d);};
+      box.appendChild(n);
     });
-    box.appendChild(wrap);
   });
 }
 
