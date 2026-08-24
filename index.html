@@ -242,6 +242,7 @@
   .pill.doing{background:#fff2dd;color:#c9820e}
   .pill.done{background:#e6f8ef;color:#12934f}
   .pill.warn{background:#ffe9ec;color:#d63a4b}
+  .pill.para{background:#eeecff;color:#5646e0}
 
   /* progress */
   .bar{height:9px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:9px}
@@ -630,12 +631,14 @@ const RIGHT_NOW=[
    'Passport, the Chamber-of-Commerce attested translations of the passport and the CBSE marksheets, and № 321019 written on actual paper. A checked bag that goes missing in Delhi costs you weeks, not a t-shirt.'],
   ['now','Land, and go straight home to Punjab',
    'MCT→DEL 26 Aug 21:20, lands 02:15. Nothing is submittable that morning: the visa centre takes no walk-ins, opens 09:00 Mon–Fri, and your file is incomplete without the HIV certificate anyway. Do not sit at the airport waiting for an embassy to open, and do not hold the driver there — let him drop you and get on with his day.'],
+  ['next','Indian SIM first — it is the key that turns everything else',
+   'Bank OTPs, UPI, forex KYC, the visa-centre appointment booking and your lab reports all need a working Indian number. Nothing below this line moves without it, which is exactly why it sits above the lab and the form. First day you can.'],
   ['next','HIV and medical panel — at a lab in PUNJAB, not Delhi',
    'Russia keeps no approved-centre list. That is GAMCA, a GCC cartel, and it does not apply in India. The certificate is a FORMAT requirement, not a place: original, on clinic letterhead, machine-generated, your full name, passport number, date of birth, country, the date the sample was collected, negative result, issued within 3 months. ₹2–3k. Doing it at home is what collapses the Delhi trip from two days into one.'],
   ['next','Fill visa.kdmid.ru, print it, sign it',
    'Name exactly as it appears on the PASSPORT — SAHIL KUMAR. The portal renders you surname-first as Кумар Сахил, which is normal for Russian paperwork, but the form has to match the document. Order and transliteration mismatches get applications refused.'],
-  ['next','Call the visa centre, ask two questions, THEN book the slot',
-   '+91 22 50323079. One: does a quota student on a указание file at the Tolstoy House centre, or directly at the embassy consular section? Two: is a medical-insurance policy required at submission — the general Indian checklists list one, and quota students normally only get ДМС after arrival. If the answer is yes, that is a new document, so ask before you book. There are no walk-ins.'],
+  ['next','Call the visa centre, ask three questions, THEN book the slot',
+   '+91 22 50323079. One: does a quota student on a указание file at the Tolstoy House centre, or directly at the embassy consular section? Two: is a medical-insurance policy required at submission — the general Indian checklists list one, and quota students normally only get ДМС after arrival. Three: is proof of funds required — quota students normally do not need it because the scholarship IS the funding, and a "no" fully decouples your bank account from this trip. Any yes is a new document, so ask before you book. There are no walk-ins.'],
   ['next','Buy the USD cash while you are still in India',
    'Already decided, no need to reopen it: BookMyForex or Orient Exchange, crisp 2013-or-newer $100 notes. Rubles are not practically buyable in India — you carry dollars and change them at a Moscow bank, never at the airport beyond day-one money.'],
   ['next','One Delhi day, and put everything in it',
@@ -647,6 +650,16 @@ const RIGHT_NOW=[
 ];
 // [pill class, label]
 const RN_PILL={now:['doing','do now'],next:['todo','next up'],hold:['warn','not yet']};
+/* 2026-08-25 (b). Deliberately NOT folded into RIGHT_NOW: that list means "each line
+   is blocked by the one above it", and these are not. He framed the bank as gating
+   Delhi ("asap my bank acc fixed I can yeet to dehli") — it does not, and serialising
+   them is the mistake that costs weeks. Separate block, stated outright. */
+const PARALLEL=[
+  ['Bank account re-KYC — start it day one, never let it hold Delhi',
+   'It is the slowest thing on your India list and the one with the least predictable tail; a dormant account usually means an actual branch visit. It matters for MONEY — the AD II remittance route needs you, the Indian resident, as the remitter — not for the visa. The visa file is passport, form, photos, HIV certificate and № 321019. No bank statement in it. The moment the certificate is in your hand and a slot is booked, you go to Delhi, fixed account or not.'],
+  ['Find out which phone number is on that account BEFORE you sit at the branch',
+   'If the KYC OTP goes to an old Indian number you no longer control, you are in the classic stuck loop and it costs you a second trip on a different day. Five minutes of checking beats a wasted morning.']
+];
 
 let VIEW=localStorage.getItem('hq_view')||'today';
 let LEDGER_FILTER='all';
@@ -1532,6 +1545,21 @@ function renderRussia(){
         </div></div>`).join('')}
       <div class="bnote">In order, top to bottom. Every line is blocked by the one above it — that is the only
         reason the flight sits at the bottom instead of the top. Three of these are yours this week: lab, form, appointment.</div>
+    </div>
+
+    <div class="sect" style="margin-top:22px"><h2>Runs alongside — not in the chain</h2><span class="cnt">don't serialise</span></div>
+    <div class="tile">
+      ${PARALLEL.map(([t,d])=>`<div class="kv">
+        <div class="mk">↔</div>
+        <div style="flex:1">
+          <div style="display:flex;gap:8px;align-items:baseline">
+            <div class="kt" style="flex:1">${t}</div>
+            <span class="pill para">parallel</span>
+          </div>
+          <div class="kd">${d}</div>
+        </div></div>`).join('')}
+      <div class="bnote">These are real and they matter — but nothing in the numbered list waits on them.
+        Start them early, run them in the background, and go to Delhi the moment the certificate and the slot exist.</div>
     </div>
 
     <div class="tile tap" id="r-stage" style="margin-top:22px">
