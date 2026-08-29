@@ -495,7 +495,9 @@ function initApp(){
 const SUPA_URL = 'https://nmhxrathmbyntpsihmqa.supabase.co';
 const SUPA_KEY = 'sb_publishable_Sw2TyzTk8QYwXDrZRvu0fw_uGdZ6hwI';
 const VAPID_PUBLIC = 'BHf0wVpg2v65hacqUSQnPdRT5KwNtSVJ2tdjclO9agebbnWao11y6dbtPoDa3Cn6fWkAU1FHfkV12ThGcfyJdik';
-const OWNER_EMAIL = 'sahil.kumar.chindalia@gmail.com';
+// No client-side email gate. It was purely cosmetic (a friendlier bounce message) —
+// the real boundary is server-side RLS (auth.jwt()->>'email' match), which blocks
+// every row regardless. Removed so his email address isn't sitting in public source.
 
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
 
@@ -612,13 +614,19 @@ const CONTACTS=[
   ['Дорм office, Domodedovo','domodedovo@rgiis.ru','+7 496 793-52-30','The building itself, separate from the academy. The dorm price is THEIR question, not the prep department’s.'],
   ['Russia Visa Centre, New Delhi','info.russiain@russia-visacentre.com','+91 22 50323079','8-11 Upper Ground Floor, Tolstoy House, 15 Tolstoy Road, Connaught Place, New Delhi 110001. Submission 09:00–15:00, collection 15:00–17:00, Mon–Fri, closed weekends. NO WALK-INS — the appointment is booked online first. Embassy consular queue: new_delhi.kdmid.ru/queue-en'],
   ['Sberbank India','','+91 11 40048888','Birla Tower, 25 Barakhamba Road, New Delhi 110001. Mon–Fri 10:00–16:00, Sat 10:00–13:00. Walk in on the same Delhi day as the visa centre and ask what an Indian resident can actually open. Free to ask, and you are already in the city.'],
-  ['Russian House India','','','Rossotrudnichestvo owns the IND- stream. It was the escalation door while the визовое указание was outstanding — that is closed now, № 321019 is issued. Keep it only in case the consulate cannot find your file.']
+  ['Russian House India','','','Rossotrudnichestvo owns the IND- stream. It was the escalation door while the визовое указание was outstanding — that is closed now, the number is issued. Keep it only in case the consulate cannot find your file.']
 ];
 // The rule the Telegram group surfaced on 2026-08-23 and the checklist did not have.
 const ENTRY_RULE='Your visa carries an ENTRY DATE, and the 90-day single-entry clock starts from it — not from the day you land. Registration (7 working days), the multi-entry conversion, SNILS, the bank and the Mir card all have to fit inside that window. Land three weeks late and you have burned a third of it before unpacking. So: book the flight tight to the entry date, and do documentation before classes.';
-// Issued 2026-08-24. The portal stage lags behind this and that confused him once
-// already — the number exists even while the pipeline still reads 4/7.
-const UKAZ='321019', UKAZ_FROM='26.08.2026';
+// The указание NUMBER itself is case-specific, so it lives in LIFE (DB, RLS
+// owner-only) as ukaz/ukaz_from — not hardcoded here, same reasoning as the
+// appointment codes above. This repo is public; the number is his alone.
+// Appointment date/app-number/security-code deliberately do NOT live here. This repo
+// is public — everything else in this file is safe to read (phone numbers, addresses,
+// static rules), but the security code is a live credential: the site's own change/
+// delete links work off id+code alone with no login. It lives in LIFE (hq_life, RLS
+// owner-only) instead, same as reg_no/visa_stage/prep_uni — read it from there, never
+// hardcode it back in here.
 /* 2026-08-25. The rest of this tab answers "what is true". This answers "what do I
    do today", which is the only question he actually opens the app with. Hardcoded
    like every other reference block here so it reads with zero network.
@@ -628,7 +636,7 @@ const RIGHT_NOW=[
   ['now','Screenshot the Air Suvidha QR into your gallery',
    'Filed 24 Aug — it was the last thing standing between you and the plane. But it has to open OFFLINE at Muscat check-in and again at Delhi immigration at 2am. Screenshot it now. Do not plan on loading an email at the counter.'],
   ['now','Documents fly in your hand luggage, never the checked bag',
-   'Passport, the Chamber-of-Commerce attested translations of the passport and the CBSE marksheets, and № 321019 written on actual paper. A checked bag that goes missing in Delhi costs you weeks, not a t-shirt.'],
+   'Passport, the Chamber-of-Commerce attested translations of the passport and the CBSE marksheets, and the visovoye ukazaniye number written on actual paper. A checked bag that goes missing in Delhi costs you weeks, not a t-shirt.'],
   ['now','Land, and go straight home to Punjab',
    'MCT→DEL 26 Aug 21:20, lands 02:15. Nothing is submittable that morning: the visa centre takes no walk-ins, opens 09:00 Mon–Fri, and your file is incomplete without the HIV certificate anyway. Do not sit at the airport waiting for an embassy to open, and do not hold the driver there — let him drop you and get on with his day.'],
   ['next','Indian SIM first — it is the key that turns everything else',
@@ -636,9 +644,11 @@ const RIGHT_NOW=[
   ['next','HIV and medical panel — at a lab in PUNJAB, not Delhi',
    'Russia keeps no approved-centre list. That is GAMCA, a GCC cartel, and it does not apply in India. The certificate is a FORMAT requirement, not a place: original, on clinic letterhead, machine-generated, your full name, passport number, date of birth, country, the date the sample was collected, negative result, issued within 3 months. ₹2–3k. Doing it at home is what collapses the Delhi trip from two days into one.'],
   ['next','Fill visa.kdmid.ru, print it, sign it',
-   'Name exactly as it appears on the PASSPORT — SAHIL KUMAR. The portal renders you surname-first as Кумар Сахил, which is normal for Russian paperwork, but the form has to match the document. Order and transliteration mismatches get applications refused.'],
-  ['next','Call the visa centre, ask three questions, THEN book the slot',
-   '+91 22 50323079. One: does a quota student on a указание file at the Tolstoy House centre, or directly at the embassy consular section? Two: is a medical-insurance policy required at submission — the general Indian checklists list one, and quota students normally only get ДМС after arrival. Three: is proof of funds required — quota students normally do not need it because the scholarship IS the funding, and a "no" fully decouples your bank account from this trip. Any yes is a new document, so ask before you book. There are no walk-ins.'],
+   'Name exactly as it appears on your PASSPORT — surname, then given name. The portal renders you surname-first, which is normal for Russian paperwork, but the form has to match the document. Order and transliteration mismatches get applications refused.'],
+  ['now','Appointment booked — see the Visa Appointment card below',
+   'Date, time and the recovery codes live in the pipeline card further down this page, not here. That pair checks status on the kdmid site with zero email — keep it written down somewhere durable too. It went wait-listed first, then a slot opened by email inside 15 minutes. Do not register a second appointment to try for an earlier one — duplicates for the same service are permanently deleted, no appeal.'],
+  ['next','Call the visa centre before the appointment — three questions',
+   '+91 22 50323079. One: for this booked appointment, does a quota student on a указание file at the Tolstoy House centre, or directly at the embassy consular section — is the booking even at the right door? Two: is a medical-insurance policy required at submission — the general Indian checklists list one, and quota students normally only get ДМС after arrival. Three: is proof of funds required — quota students normally do not need it because the scholarship IS the funding, and a "no" fully decouples your bank account from this trip. Any yes is a new document, so ask before the appointment date, not at the counter.'],
   ['next','Buy the USD cash while you are still in India',
    'Already decided, no need to reopen it: BookMyForex or Orient Exchange, crisp 2013-or-newer $100 notes. Rubles are not practically buyable in India — you carry dollars and change them at a Moscow bank, never at the airport beyond day-one money.'],
   ['next','One Delhi day, and put everything in it',
@@ -656,7 +666,7 @@ const RN_PILL={now:['doing','do now'],next:['todo','next up'],hold:['warn','not 
    them is the mistake that costs weeks. Separate block, stated outright. */
 const PARALLEL=[
   ['Bank account re-KYC — start it day one, never let it hold Delhi',
-   'It is the slowest thing on your India list and the one with the least predictable tail; a dormant account usually means an actual branch visit. It matters for MONEY — the AD II remittance route needs you, the Indian resident, as the remitter — not for the visa. The visa file is passport, form, photos, HIV certificate and № 321019. No bank statement in it. The moment the certificate is in your hand and a slot is booked, you go to Delhi, fixed account or not.'],
+   'It is the slowest thing on your India list and the one with the least predictable tail; a dormant account usually means an actual branch visit. It matters for MONEY — the AD II remittance route needs you, the Indian resident, as the remitter — not for the visa. The visa file is passport, form, photos, HIV certificate and the visovoye ukazaniye number. No bank statement in it. The moment the certificate is in your hand and a slot is booked, you go to Delhi, fixed account or not.'],
   ['Find out which phone number is on that account BEFORE you sit at the branch',
    'If the KYC OTP goes to an old Indian number you no longer control, you are in the classic stuck loop and it costs you a second trip on a different day. Five minutes of checking beats a wasted morning.']
 ];
@@ -696,10 +706,6 @@ $('#signout').onclick=async()=>{await sb.auth.signOut();location.reload();};
 async function boot(){
   let session=null;
   try{ ({data:{session}}=await sb.auth.getSession()); }catch(_){ session=null; }
-  if(session&&session.user.email!==OWNER_EMAIL){
-    await sb.auth.signOut();$('#login').classList.remove('hidden');
-    loginMsg("That account isn't authorized.",true);return;
-  }
   // No session AND no network is not the same as "not logged in". If he has
   // signed in on this device before and there is a local mirror, let him in —
   // the data is already on his phone and locking him out protects nothing.
@@ -1013,7 +1019,7 @@ function openSettings(){
      <div class="sheet-head"><div class="av" style="background:#6d5efc">W</div><div style="font-size:20px;font-weight:800">Business details</div></div>
      <p style="color:var(--mut);font-size:13.5px;margin:-8px 2px 6px">These get stamped on every invoice.</p>
      <div class="fg"><div class="lbl">Business name</div><input id="s-biz" value="${esc(s.biz_name||'Weebji Studios')}"></div>
-     <div class="fg"><div class="lbl">Your name</div><input id="s-owner" value="${esc(s.owner_name||'')}" placeholder="Sahil Kumar"></div>
+     <div class="fg"><div class="lbl">Your name</div><input id="s-owner" value="${esc(s.owner_name||'')}" placeholder="Your name"></div>
      <div class="row2">
        <div class="fg"><div class="lbl">Email</div><input id="s-email" value="${esc(s.email||'')}" placeholder="you@email.com"></div>
        <div class="fg"><div class="lbl">Phone / WhatsApp</div><input id="s-phone" value="${esc(s.phone||'')}" placeholder="+968 …"></div>
@@ -1570,7 +1576,7 @@ function renderRussia(){
       <div class="steps">${VISA_STEPS.map(s=>
         `<div class="s ${s.n<cur?'dn':s.n===cur?'cur':''}"><div class="n">${s.n<cur?'✓':s.n}</div><div class="lb">${s.l}</div></div>`).join('')}</div>
       <p style="color:var(--mut);font-size:13px;font-weight:600;margin-top:12px;line-height:1.5">
-        ${cur<7?`Визовое указание <b style="color:var(--ink)">№ ${UKAZ}</b> is ISSUED, valid from ${UKAZ_FROM}. That is a valid-FROM
+        ${cur<7?`Визовое указание <b style="color:var(--ink)">№ ${esc(LIFE.ukaz||'—')}</b> is ISSUED, valid from ${esc(LIFE.ukaz_from||'—')}. That is a valid-FROM
                  date, not a deadline, and the portal stage above lags behind it — it can still read 4/7 while the number exists.
                  Nobody gets emailed this: you carry it to the visa centre in New Delhi and they look it up themselves.
                  The next real step is the visa application, not the portal.`
@@ -1580,6 +1586,11 @@ function renderRussia(){
         <div class="curcard" style="flex:1"><div class="c">PREP YEAR</div><div class="v" style="font-size:14.5px">${esc(LIFE.prep_uni||'—')}</div></div>
         <div class="curcard" style="flex:1"><div class="c">DEGREE</div><div class="v" style="font-size:14.5px">${esc(LIFE.degree_uni||'—')}</div></div>
       </div>
+      ${LIFE.appt_date?`<div class="curcard" style="margin-top:8px">
+        <div class="c">VISA APPOINTMENT</div>
+        <div class="v" style="font-size:14.5px">${esc(LIFE.appt_day||'')} ${esc(LIFE.appt_date)}, ${esc(LIFE.appt_time||'')} — ${esc(LIFE.appt_window||'')}</div>
+        <div style="color:var(--mut);font-size:12px;font-weight:700;margin-top:3px">App ${esc(LIFE.appt_app||'—')} · Code ${esc(LIFE.appt_code||'—')} · ${esc(LIFE.appt_place||'')}</div>
+      </div>`:''}
     </div>
 
     <div class="sect"><h2>${arrived?'Arrival checklist':'Departure readiness'}</h2><button class="act" id="r-addready">+ Item</button></div>
